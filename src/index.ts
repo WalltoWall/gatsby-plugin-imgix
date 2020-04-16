@@ -1,9 +1,4 @@
-import {
-  buildImgixUrl,
-  ImgixUrlQueryParams,
-  ImgixFit,
-  ImgixRect,
-} from 'ts-imgix'
+import { buildImgixUrl, ImgixUrlQueryParams, ImgixFit } from 'ts-imgix'
 import { FixedObject, FluidObject } from 'gatsby-image'
 import { createHash } from 'crypto'
 import probe from 'probe-image-size'
@@ -49,24 +44,6 @@ const DEFAULT_PLACEHOLDER_PARAMS: ImgixUrlQueryParams = {
 
   // Since this is a low quality placeholer, we can drop down the quality.
   q: 20,
-}
-
-/**
- * Converts a rect value from a URL parameter string to an ImgixRect object for use with ts-imgix.
- *
- * @param rect String `rect` from an Imgix URL.
- *
- * @returns An object representation of `rect`.
- */
-const rectStrToObj = (rect: string): ImgixRect => {
-  const [x, y, w, h] = rect.split(',')
-
-  return {
-    x: Number.parseInt(x),
-    y: Number.parseInt(y),
-    w: Number.parseInt(w),
-    h: Number.parseInt(h),
-  }
 }
 
 const extractURLParts = (url: string) => {
@@ -158,27 +135,22 @@ export const buildFixedGatsbyImage = (
   sourceHeight: number,
   args: GatsbyImageFixedArgs = {},
 ): FixedObject => {
-  const { baseURL, params } = extractURLParts(url)
+  const { baseURL } = extractURLParts(url)
 
-  const rect = params.get('rect') ?? undefined
   const aspectRatio = sourceWidth / sourceHeight
   const width = args.width ?? DEFAULT_FIXED_WIDTH
   const height = args.height ?? Math.round(width / aspectRatio)
   const quality = args.quality
 
-  const base64 = buildPlaceholderURL(baseURL, {
-    rect: rect ? rectStrToObj(rect) : undefined,
-  })
+  const base64 = buildPlaceholderURL(baseURL, {})
   const src = buildURL(baseURL, {
     w: width,
     h: height,
-    rect: rect ? rectStrToObj(rect) : undefined,
     q: quality,
   })
   const srcSet = buildFixedSrcSet(baseURL, {
     w: width,
     h: height,
-    rect: rect ? rectStrToObj(rect) : undefined,
     q: quality,
   })
 
@@ -206,7 +178,9 @@ export const buildFluidGatsbyImage2 = async (
   args: GatsbyImageFluidArgs = {},
   secureURLToken?: string,
 ): Promise<FluidObject> => {
-  const { width: sourceWidth, height: sourceHeight } = await probe(url)
+  const { width: sourceWidth, height: sourceHeight } = await probe(
+    secureURLToken ? signURL(url, secureURLToken) : url,
+  )
 
   const aspectRatio = sourceWidth / sourceHeight
   const width = args.maxWidth ?? DEFAULT_FLUID_MAX_WIDTH
@@ -234,53 +208,6 @@ export const buildFluidGatsbyImage2 = async (
     },
     breakpoints,
     secureURLToken,
-  )
-
-  return {
-    base64,
-    aspectRatio,
-    src,
-    srcWebp: src,
-    srcSet,
-    srcSetWebp: srcSet,
-    sizes: '',
-  }
-}
-
-export const buildFluidGatsbyImage = (
-  url: string,
-  sourceWidth: number,
-  sourceHeight: number,
-  args: GatsbyImageFluidArgs = {},
-): FluidObject => {
-  const { baseURL, params } = extractURLParts(url)
-
-  const rect = params.get('rect') ?? undefined
-  const aspectRatio = sourceWidth / sourceHeight
-  const width = args.maxWidth ?? DEFAULT_FLUID_MAX_WIDTH
-  const height = args.maxHeight ?? Math.round(width / aspectRatio)
-  const quality = args.quality
-  const breakpoints = args.srcSetBreakpoints
-
-  const base64 = buildPlaceholderURL(baseURL, {
-    rect: rect ? rectStrToObj(rect) : undefined,
-  })
-  const src = buildURL(baseURL, {
-    w: width,
-    h: height,
-    rect: rect ? rectStrToObj(rect) : undefined,
-    q: quality,
-  })
-  const srcSet = buildFluidSrcSet(
-    baseURL,
-    aspectRatio,
-    {
-      w: width,
-      h: height,
-      rect: rect ? rectStrToObj(rect) : undefined,
-      q: quality,
-    },
-    breakpoints,
   )
 
   return {
