@@ -24,12 +24,18 @@
   "peerDependencies": {},
   "name": "gatsby-plugin-imgix",
   "author": "Angelo Ashmore",
+  "dependencies": {
+    "fs-extra": "^9.0.0",
+    "probe-image-size": "^5.0.0",
+    "ts-imgix": "^0.0.11"
+  },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
     "@rollup/plugin-json": "^4.0.2",
     "@types/fs-extra": "^8.1.0",
     "@types/jest": "^25.2.1",
+    "cross-env": "^7.0.2",
     "gatsby": "^2.20.23",
     "gatsby-image": "^2.3.2",
     "husky": "^4.2.5",
@@ -37,7 +43,6 @@
     "rollup": "^2.6.1",
     "rollup-plugin-typescript2": "^0.27.0",
     "standard-version": "^7.1.0",
-    "tsdx": "^0.13.2",
     "tslib": "^1.11.1",
     "typescript": "^3.8.3"
   },
@@ -57,10 +62,5 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
-  },
-  "dependencies": {
-    "fs-extra": "^9.0.0",
-    "probe-image-size": "^5.0.0",
-    "ts-imgix": "^0.0.11"
   }
 }
