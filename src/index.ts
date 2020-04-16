@@ -5,6 +5,8 @@ import {
   ImgixRect,
 } from 'ts-imgix'
 import { FixedObject, FluidObject } from 'gatsby-image'
+import { createHash } from 'crypto'
+import probe from 'probe-image-size'
 
 // Default width for `fixed` images. Same as `gatsby-plugin-sharp`.
 const DEFAULT_FIXED_WIDTH = 400
@@ -75,20 +77,36 @@ const extractURLParts = (url: string) => {
   return { baseURL, params }
 }
 
-const buildURL = (url: string, params: ImgixUrlQueryParams) =>
-  buildImgixUrl(url)({ ...DEFAULT_PARAMS, ...params })
+const signURL = (url: string, token: string) => {
+  const instance = new URL(url)
+  const signatureBase = token + instance.pathname + instance.search
+  const signature = createHash('md5').update(signatureBase).digest('hex')
 
-const buildPlaceholderURL = (url: string, params: ImgixUrlQueryParams) =>
-  buildURL(url, { ...DEFAULT_PLACEHOLDER_PARAMS, ...params })
+  instance.searchParams.set('s', signature)
+
+  return instance.href
+}
+
+const buildURL = (url: string, params: ImgixUrlQueryParams, token?: string) => {
+  const imgixURL = buildImgixUrl(url)({ ...DEFAULT_PARAMS, ...params })
+  return token ? signURL(imgixURL, token) : imgixURL
+}
+
+const buildPlaceholderURL = (
+  url: string,
+  params: ImgixUrlQueryParams,
+  token?: string,
+) => buildURL(url, { ...DEFAULT_PLACEHOLDER_PARAMS, ...params }, token)
 
 const buildFixedSrcSet = (
   baseURL: string,
   params: ImgixUrlQueryParams,
   resolutions: number[] = DEFAULT_FIXED_RESOLUTIONS,
+  token?: string,
 ) =>
   resolutions
     .map((resolution) => {
-      const url = buildURL(baseURL, { ...params, dpr: resolution })
+      const url = buildURL(baseURL, { ...params, dpr: resolution }, token)
       return `${url} ${resolution}x`
     })
     .join(', ')
@@ -100,6 +118,7 @@ const buildFluidSrcSet = (
     w: NonNullable<ImgixUrlQueryParams['w']>
   },
   breakpoints?: number[],
+  token?: string,
 ) => {
   const { w: width } = params
 
@@ -112,11 +131,15 @@ const buildFluidSrcSet = (
   return uniqSortedBreakpoints
     .map((breakpoint) => {
       if (!breakpoint) return
-      const url = buildURL(baseURL, {
-        ...params,
-        w: breakpoint,
-        h: Math.round(breakpoint / aspectRatio),
-      })
+      const url = buildURL(
+        baseURL,
+        {
+          ...params,
+          w: breakpoint,
+          h: Math.round(breakpoint / aspectRatio),
+        },
+        token,
+      )
       return `${url} ${Math.round(breakpoint)}w`
     })
     .filter(Boolean)
@@ -181,8 +204,48 @@ type GatsbyImageFluidArgs = {
 export const buildFluidGatsbyImage2 = async (
   url: string,
   args: GatsbyImageFluidArgs = {},
-  secureURLToken: string,
-): FluidObject => {}
+  secureURLToken?: string,
+): Promise<FluidObject> => {
+  const { width: sourceWidth, height: sourceHeight } = await probe(url)
+
+  const aspectRatio = sourceWidth / sourceHeight
+  const width = args.maxWidth ?? DEFAULT_FLUID_MAX_WIDTH
+  const height = args.maxHeight ?? Math.round(width / aspectRatio)
+  const quality = args.quality
+  const breakpoints = args.srcSetBreakpoints
+
+  const base64 = buildPlaceholderURL(url, {}, secureURLToken)
+  const src = buildURL(
+    url,
+    {
+      w: width,
+      h: height,
+      q: quality,
+    },
+    secureURLToken,
+  )
+  const srcSet = buildFluidSrcSet(
+    url,
+    aspectRatio,
+    {
+      w: width,
+      h: height,
+      q: quality,
+    },
+    breakpoints,
+    secureURLToken,
+  )
+
+  return {
+    base64,
+    aspectRatio,
+    src,
+    srcWebp: src,
+    srcSet,
+    srcSetWebp: srcSet,
+    sizes: '',
+  }
+}
 
 export const buildFluidGatsbyImage = (
   url: string,

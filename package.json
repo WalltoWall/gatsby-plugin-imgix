@@ -51,6 +51,7 @@
     ]
   },
   "dependencies": {
+    "probe-image-size": "^5.0.0",
     "ts-imgix": "^0.0.11"
   }
 }
