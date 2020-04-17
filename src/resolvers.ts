@@ -1,16 +1,65 @@
+import { Cache as GatsbyCache } from 'gatsby'
+import fetch from 'node-fetch'
+
 import {
   buildFixedGatsbyImage,
-  buildFluidGatsbyImage2,
+  buildFluidGatsbyImage,
   GatsbyImageFixedArgs,
   GatsbyImageFluidArgs,
-} from '.'
+  signURL,
+} from './builders'
 
-export const createFixedResolver = (token?: string) => (
-  url: string,
-  args: GatsbyImageFixedArgs,
-) => (url ? buildFixedGatsbyImage(url, 1, 1, args, token) : undefined)
+interface ImgixMetadata {
+  PixelWidth: number
+  PixelHeight: number
+}
 
-export const createFluidResolver = (token?: string) => (
+const probeMetadata = async (
   url: string,
-  args: GatsbyImageFluidArgs,
-) => (url ? buildFluidGatsbyImage2(url, args, token) : undefined)
+  cache: GatsbyCache['cache'],
+  token?: string,
+) => {
+  const key = `metadata___${url}`
+
+  const cached = await cache.get(key)
+  if (cached) return cached
+
+  const instance = new URL(url)
+  instance.searchParams.set('fm', 'json')
+  const jsonUrl = token ? signURL(instance.href, token) : instance.href
+
+  const res = await fetch(jsonUrl)
+  const metadata = (await res.json()) as ImgixMetadata
+
+  cache.set(key, metadata)
+
+  return metadata
+}
+
+export const createFixedResolver = (
+  cache: GatsbyCache['cache'],
+  token?: string,
+) => async (url: string, args: GatsbyImageFixedArgs) => {
+  if (!url) return
+
+  const {
+    PixelWidth: sourceWidth,
+    PixelHeight: sourceHeight,
+  } = await probeMetadata(url, cache, token)
+
+  return buildFixedGatsbyImage(url, sourceWidth, sourceHeight, args, token)
+}
+
+export const createFluidResolver = (
+  cache: GatsbyCache['cache'],
+  token?: string,
+) => async (url: string, args: GatsbyImageFluidArgs) => {
+  if (!url) return
+
+  const {
+    PixelWidth: sourceWidth,
+    PixelHeight: sourceHeight,
+  } = await probeMetadata(url, cache, token)
+
+  return buildFluidGatsbyImage(url, sourceWidth, sourceHeight, args, token)
+}
