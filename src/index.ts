@@ -123,7 +123,7 @@ const buildFluidSrcSet = (
     .join(', ')
 }
 
-type GatsbyImageFixedArgs = {
+export type GatsbyImageFixedArgs = {
   width?: number
   height?: number
   quality?: number
@@ -134,6 +134,7 @@ export const buildFixedGatsbyImage = (
   sourceWidth: number,
   sourceHeight: number,
   args: GatsbyImageFixedArgs = {},
+  secureURLToken?: string,
 ): FixedObject => {
   const { baseURL } = extractURLParts(url)
 
@@ -142,17 +143,26 @@ export const buildFixedGatsbyImage = (
   const height = args.height ?? Math.round(width / aspectRatio)
   const quality = args.quality
 
-  const base64 = buildPlaceholderURL(baseURL, {})
-  const src = buildURL(baseURL, {
-    w: width,
-    h: height,
-    q: quality,
-  })
-  const srcSet = buildFixedSrcSet(baseURL, {
-    w: width,
-    h: height,
-    q: quality,
-  })
+  const base64 = buildPlaceholderURL(baseURL, {}, secureURLToken)
+  const src = buildURL(
+    baseURL,
+    {
+      w: width,
+      h: height,
+      q: quality,
+    },
+    secureURLToken,
+  )
+  const srcSet = buildFixedSrcSet(
+    baseURL,
+    {
+      w: width,
+      h: height,
+      q: quality,
+    },
+    undefined,
+    secureURLToken,
+  )
 
   return {
     base64,
@@ -165,7 +175,7 @@ export const buildFixedGatsbyImage = (
   }
 }
 
-type GatsbyImageFluidArgs = {
+export type GatsbyImageFluidArgs = {
   maxWidth?: number
   maxHeight?: number
   sizes?: string

@@ -25,6 +25,7 @@
   "name": "gatsby-plugin-imgix",
   "author": "Angelo Ashmore",
   "dependencies": {
+    "dlv": "^1.1.3",
     "fs-extra": "^9.0.0",
     "probe-image-size": "^5.0.0",
     "ts-imgix": "^0.0.11"
@@ -33,6 +34,7 @@
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
     "@rollup/plugin-json": "^4.0.2",
+    "@types/dlv": "^1.1.2",
     "@types/fs-extra": "^8.1.0",
     "@types/jest": "^25.2.1",
     "cross-env": "^7.0.2",
