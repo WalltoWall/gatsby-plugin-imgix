@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.1.0...v0.2.0) (2020-04-17)
+
+
+### Features
+
+* add untested beginner-friendly API ([00cc92f](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/00cc92fffad04507bb1f50b8ba22b5ec46a76b7c))
+* working public API ([68d4f93](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/68d4f93dfade41f7e87336125b5e3c3001f9dfcb))
+
 ## 0.1.0 (2020-04-16)
 
 
