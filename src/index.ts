@@ -1,5 +1,6 @@
-export { buildFixedGatsbyImage, buildFluidGatsbyImage } from './builders'
-export { createFixedResolver, createFluidResolver } from './resolvers'
+export { buildFixedGatsbyImage, createFixedResolver, createFixedType } from './fixed'
+export { buildFluidGatsbyImage, createFluidResolver, createFluidType } from './fluid'
+export { transformUrlForWebProxy } from './utils'
 
 // prettier-eslint runs into a parsing error
 // eslint-disable-next-line

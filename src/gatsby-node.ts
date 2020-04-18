@@ -8,11 +8,8 @@ import {
   PluginOptions as GatsbyPluginOptions,
 } from 'gatsby'
 
-import {
-  createBase64Resolver,
-  createFixedResolver,
-  createFluidResolver,
-} from './resolvers'
+import { createFixedResolver, createFixedType } from './fixed'
+import { createFluidResolver, createFluidType } from './fluid'
 import { invariant, transformUrlForWebProxy } from './utils'
 
 enum ImgixSourceType {
@@ -150,42 +147,15 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
 
   createTypes([
     ...fieldTypes,
-    schema.buildObjectType({
-      name: 'ImgixImageFixedType',
-      fields: {
-        base64: {
-          type: 'String!',
-          resolve: createBase64Resolver({
-            cache,
-            secureURLToken: pluginOptions.secureURLToken,
-          }),
-        },
-        aspectRatio: 'Float!',
-        width: 'Float!',
-        height: 'Float!',
-        src: 'String!',
-        srcSet: 'String!',
-        srcWebp: 'String!',
-        srcSetWebp: 'String!',
-      },
+    createFluidType({
+      cache,
+      schema,
+      secureURLToken: pluginOptions.secureURLToken,
     }),
-    schema.buildObjectType({
-      name: 'ImgixImageFluidType',
-      fields: {
-        base64: {
-          type: 'String!',
-          resolve: createBase64Resolver({
-            cache,
-            secureURLToken: pluginOptions.secureURLToken,
-          }),
-        },
-        aspectRatio: 'Float!',
-        src: 'String!',
-        srcSet: 'String!',
-        srcWebp: 'String!',
-        srcSetWebp: 'String!',
-        sizes: 'String!',
-      },
+    createFixedType({
+      cache,
+      schema,
+      secureURLToken: pluginOptions.secureURLToken,
     }),
     schema.buildObjectType({
       name: 'ImgixImageType',

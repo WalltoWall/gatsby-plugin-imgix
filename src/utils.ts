@@ -43,11 +43,11 @@ type ProbeMetadataArgs = {
   secureURLToken?: string
 }
 
-export const probeMetadata = async (
-  args: ProbeMetadataArgs,
-): Promise<ImgixMetadata> => {
-  const { url, cache, secureURLToken } = args
-
+export const probeMetadata = async ({
+  url,
+  cache,
+  secureURLToken,
+}: ProbeMetadataArgs): Promise<ImgixMetadata> => {
   const key = `metadata___${url}`
 
   const cached = await cache.get(key)
@@ -74,9 +74,11 @@ type FetchBase64Args = {
   secureURLToken?: string
 }
 
-export const fetchBase64URL = async (args: FetchBase64Args) => {
-  const { url, cache, secureURLToken } = args
-
+export const fetchBase64URL = async ({
+  url,
+  cache,
+  secureURLToken,
+}: FetchBase64Args) => {
   const key = `base64URL___${url}`
 
   const cached = await cache.get(key)
