@@ -76,7 +76,7 @@ type BuildFixedSrcSetArgs = BuildURLArgs
 const buildFixedSrcSet = (args: BuildFixedSrcSetArgs) => {
   const { url: baseURL, params, secureURLToken } = args
 
-  return FIXED_RESOLUTIONS.map((resolution) => {
+  return FIXED_RESOLUTIONS.map(resolution => {
     const url = buildURL({
       url: baseURL,
       params: { ...params, dpr: resolution },
@@ -101,7 +101,7 @@ const buildFluidSrcSet = (args: BuildFluidSrcSetArgs) => {
   let { srcSetBreakpoints } = args
 
   if (!srcSetBreakpoints)
-    srcSetBreakpoints = DEFAULT_FLUID_BREAKPOINT_FACTORS.map((x) => width * x)
+    srcSetBreakpoints = DEFAULT_FLUID_BREAKPOINT_FACTORS.map(x => width * x)
 
   // Remove duplicates, sort by numerical value, and ensure maxWidth is added.
   const uniqSortedBreakpoints = Array.from(
@@ -109,8 +109,8 @@ const buildFluidSrcSet = (args: BuildFluidSrcSetArgs) => {
   ).sort()
 
   return uniqSortedBreakpoints
-    .map((breakpoint) => {
-      if (!breakpoint) return
+    .map(breakpoint => {
+      if (!breakpoint) return undefined
 
       const url = buildURL({
         url: baseURL,

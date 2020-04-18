@@ -18,8 +18,13 @@ export const transformUrlForWebProxy = (url: string, domain: string) => {
 
 export const signURL = (url: string, token: string) => {
   const instance = new URL(url)
+
+  instance.searchParams.delete('s')
+
   const signatureBase = token + instance.pathname + instance.search
-  const signature = createHash('md5').update(signatureBase).digest('hex')
+  const signature = createHash('md5')
+    .update(signatureBase)
+    .digest('hex')
 
   instance.searchParams.set('s', signature)
 
@@ -27,6 +32,7 @@ export const signURL = (url: string, token: string) => {
 }
 
 interface ImgixMetadata {
+  'Content-Type': string
   PixelWidth: number
   PixelHeight: number
 }
@@ -37,7 +43,9 @@ type ProbeMetadataArgs = {
   secureURLToken?: string
 }
 
-export const probeMetadata = async (args: ProbeMetadataArgs) => {
+export const probeMetadata = async (
+  args: ProbeMetadataArgs,
+): Promise<ImgixMetadata> => {
   const { url, cache, secureURLToken } = args
 
   const key = `metadata___${url}`
@@ -45,6 +53,7 @@ export const probeMetadata = async (args: ProbeMetadataArgs) => {
   const cached = await cache.get(key)
   if (cached) return cached
 
+  // TODO: Convert to ts-imgix once it supports `fm`.
   const instance = new URL(url)
   instance.searchParams.set('fm', 'json')
   const jsonUrl = secureURLToken
@@ -59,3 +68,28 @@ export const probeMetadata = async (args: ProbeMetadataArgs) => {
   return metadata
 }
 
+type FetchBase64Args = {
+  url: string
+  cache: GatsbyCache['cache']
+  secureURLToken?: string
+}
+
+export const fetchBase64URL = async (args: FetchBase64Args) => {
+  const { url, cache, secureURLToken } = args
+
+  const key = `base64URL___${url}`
+
+  const cached = await cache.get(key)
+  if (cached) return cached
+
+  const res = await fetch(url)
+  const buffer = await res.buffer()
+  const base64 = buffer.toString('base64')
+
+  const metadata = await probeMetadata({ url, cache, secureURLToken })
+  const base64URL = `data:${metadata['Content-Type']};base64,${base64}`
+
+  cache.set(key, base64URL)
+
+  return base64URL
+}

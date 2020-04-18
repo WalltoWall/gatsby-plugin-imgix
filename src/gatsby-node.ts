@@ -1,4 +1,4 @@
-import { copyFileSync } from 'fs-extra'
+import fs from 'fs'
 import path from 'path'
 import dlv from 'dlv'
 import {
@@ -8,7 +8,11 @@ import {
   PluginOptions as GatsbyPluginOptions,
 } from 'gatsby'
 
-import { createFixedResolver, createFluidResolver } from './resolvers'
+import {
+  createBase64Resolver,
+  createFixedResolver,
+  createFluidResolver,
+} from './resolvers'
 import { invariant, transformUrlForWebProxy } from './utils'
 
 enum ImgixSourceType {
@@ -56,7 +60,7 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = async (
   )
 
   const fieldOptions = pluginOptions.fields.filter(
-    (fieldOptions) => fieldOptions.nodeType === node.internal.type,
+    fieldOptions => fieldOptions.nodeType === node.internal.type,
   )
   if (fieldOptions.length < 1) return
 
@@ -102,7 +106,7 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = async (
       )
 
       if (Array.isArray(fieldValue))
-        fieldValue = fieldValue.map((url) =>
+        fieldValue = fieldValue.map(url =>
           transformUrlForWebProxy(url, pluginOptions.domain!),
         )
       else
@@ -134,7 +138,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
     reporter,
   )
 
-  const fieldTypes = pluginOptions.fields.map((fieldOptions) =>
+  const fieldTypes = pluginOptions.fields.map(fieldOptions =>
     schema.buildObjectType({
       name: `${fieldOptions.nodeType}Fields`,
       fields: {
@@ -149,7 +153,13 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
     schema.buildObjectType({
       name: 'ImgixImageFixedType',
       fields: {
-        base64: 'String!',
+        base64: {
+          type: 'String!',
+          resolve: createBase64Resolver({
+            cache,
+            secureURLToken: pluginOptions.secureURLToken,
+          }),
+        },
         aspectRatio: 'Float!',
         width: 'Float!',
         height: 'Float!',
@@ -162,7 +172,13 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
     schema.buildObjectType({
       name: 'ImgixImageFluidType',
       fields: {
-        base64: 'String!',
+        base64: {
+          type: 'String!',
+          resolve: createBase64Resolver({
+            cache,
+            secureURLToken: pluginOptions.secureURLToken,
+          }),
+        },
         aspectRatio: 'Float!',
         src: 'String!',
         srcSet: 'String!',
@@ -206,14 +222,12 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
   ])
 }
 
-export const onPreExtractQueries: GatsbyNode['onPreExtractQueries'] = (
-  gatsbyContext,
-) => {
+export const onPreExtractQueries: GatsbyNode['onPreExtractQueries'] = gatsbyContext => {
   const { store } = gatsbyContext
   const { program } = store.getState()
 
   // Add fragments for GatsbyImgixImage to .cache/fragments.
-  copyFileSync(
+  fs.copyFileSync(
     path.resolve(__dirname, '../fragments.js'),
     path.resolve(
       program.directory,

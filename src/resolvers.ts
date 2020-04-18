@@ -1,4 +1,5 @@
 import { Cache as GatsbyCache } from 'gatsby'
+import { FluidObject, FixedObject } from 'gatsby-image'
 
 import {
   buildFixedGatsbyImage,
@@ -6,11 +7,22 @@ import {
   GatsbyImageFixedArgs,
   GatsbyImageFluidArgs,
 } from './builders'
-import { probeMetadata } from './utils'
+import { probeMetadata, fetchBase64URL } from './utils'
 
 type CreateResolverArgs = {
   cache: GatsbyCache['cache']
   secureURLToken?: string
+}
+
+export const createBase64Resolver = (args: CreateResolverArgs) => async (
+  obj: FixedObject | FluidObject,
+) => {
+  const { cache, secureURLToken } = args
+  const { base64: url } = obj
+
+  if (!url) return
+
+  return await fetchBase64URL({ url, cache, secureURLToken })
 }
 
 export const createFixedResolver = (args: CreateResolverArgs) => async (
