@@ -36,7 +36,7 @@ type FieldOptions = {
 
 interface PluginOptions extends GatsbyPluginOptions {
   domain?: string
-  token?: string
+  secureURLToken?: string
   sourceType?: ImgixSourceType
   fields?: FieldOptions[]
 }
@@ -96,7 +96,7 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = async (
         reporter,
       )
       invariant(
-        pluginOptions.token !== undefined,
+        pluginOptions.secureURLToken !== undefined,
         'a secure URL token must be provided if sourceType is webProxy',
         reporter,
       )
@@ -129,7 +129,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
   )
   invariant(
     pluginOptions.sourceType !== ImgixSourceType.WebProxy ||
-      Boolean(pluginOptions.token),
+      Boolean(pluginOptions.secureURLToken),
     'a secure URL token must be provided if sourceType is webProxy',
     reporter,
   )
@@ -174,26 +174,32 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
     schema.buildObjectType({
       name: 'ImgixImageType',
       fields: {
-        url: {
-          type: 'String',
-          resolve: (url: string) => url,
-        },
+        url: 'String',
         fixed: {
           type: 'ImgixImageFixedType',
           args: {
             width: 'Int',
             height: 'Int',
+            // imgixParams: '',
           },
-          resolve: createFixedResolver(cache, pluginOptions.token),
+          resolve: createFixedResolver({
+            cache,
+            secureURLToken: pluginOptions.secureURLToken,
+          }),
         },
         fluid: {
           type: 'ImgixImageFluidType',
           args: {
             maxWidth: 'Int',
             maxHeight: 'Int',
+            sizes: 'String',
             srcSetBreakpoints: '[Int!]',
+            // imgixParams: '',
           },
-          resolve: createFluidResolver(cache, pluginOptions.token),
+          resolve: createFluidResolver({
+            cache,
+            secureURLToken: pluginOptions.secureURLToken,
+          }),
         },
       },
     }),

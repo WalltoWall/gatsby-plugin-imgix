@@ -1,12 +1,13 @@
 import { buildImgixUrl, ImgixUrlQueryParams, ImgixFit } from 'ts-imgix'
 import { FixedObject, FluidObject } from 'gatsby-image'
-import { createHash } from 'crypto'
+
+import { signURL } from './utils'
 
 // Default width for `fixed` images. Same as `gatsby-plugin-sharp`.
 const DEFAULT_FIXED_WIDTH = 400
 
 // Default resolutions for `fixed` images. Same as `gatsby-plugin-sharp`.
-const DEFAULT_FIXED_RESOLUTIONS = [1, 1.5, 2]
+const FIXED_RESOLUTIONS = [1, 1.5, 2]
 
 // Default maxWidth for `fluid` images. Same as `gatsby-plugin-sharp`.
 const DEFAULT_FLUID_MAX_WIDTH = 800
@@ -32,7 +33,7 @@ const DEFAULT_PARAMS: ImgixUrlQueryParams = {
 /**
  * Default params for the placeholder image.
  */
-const DEFAULT_PLACEHOLDER_PARAMS: ImgixUrlQueryParams = {
+const DEFAULT_LQIP_PARAMS: ImgixUrlQueryParams = {
   // 100 is greater than the default `gatsby-transformer-sharp` size, but it
   // improves the placeholder quality significantly.
   w: 100,
@@ -45,77 +46,82 @@ const DEFAULT_PLACEHOLDER_PARAMS: ImgixUrlQueryParams = {
   q: 20,
 }
 
-const extractURLParts = (url: string) => {
-  const instance = new URL(url)
-  const baseURL = instance.origin + instance.pathname
-  const params = instance.searchParams
-
-  return { baseURL, params }
+type BuildURLArgs = {
+  url: string
+  params?: ImgixUrlQueryParams
+  secureURLToken?: string
 }
 
-export const signURL = (url: string, token: string) => {
-  const instance = new URL(url)
-  const signatureBase = token + instance.pathname + instance.search
-  const signature = createHash('md5').update(signatureBase).digest('hex')
+const buildURL = (args: BuildURLArgs) => {
+  const { url, params, secureURLToken } = args
 
-  instance.searchParams.set('s', signature)
-
-  return instance.href
-}
-
-const buildURL = (url: string, params: ImgixUrlQueryParams, token?: string) => {
   const imgixURL = buildImgixUrl(url)({ ...DEFAULT_PARAMS, ...params })
-  return token ? signURL(imgixURL, token) : imgixURL
+
+  return secureURLToken ? signURL(imgixURL, secureURLToken) : imgixURL
 }
 
-const buildPlaceholderURL = (
-  url: string,
-  params: ImgixUrlQueryParams,
-  token?: string,
-) => buildURL(url, { ...DEFAULT_PLACEHOLDER_PARAMS, ...params }, token)
+type BuildPlaceholderURLArgs = BuildURLArgs
 
-const buildFixedSrcSet = (
-  baseURL: string,
-  params: ImgixUrlQueryParams,
-  resolutions: number[] = DEFAULT_FIXED_RESOLUTIONS,
-  token?: string,
-) =>
-  resolutions
-    .map((resolution) => {
-      const url = buildURL(baseURL, { ...params, dpr: resolution }, token)
-      return `${url} ${resolution}x`
+const buildLQIPURL = (args: BuildPlaceholderURLArgs) =>
+  buildURL({
+    ...args,
+    params: {
+      ...DEFAULT_LQIP_PARAMS,
+      ...args.params,
+    },
+  })
+
+type BuildFixedSrcSetArgs = BuildURLArgs
+
+const buildFixedSrcSet = (args: BuildFixedSrcSetArgs) => {
+  const { url: baseURL, params, secureURLToken } = args
+
+  return FIXED_RESOLUTIONS.map((resolution) => {
+    const url = buildURL({
+      url: baseURL,
+      params: { ...params, dpr: resolution },
+      secureURLToken,
     })
-    .join(', ')
 
-const buildFluidSrcSet = (
-  baseURL: string,
-  aspectRatio: number,
-  params: ImgixUrlQueryParams & {
-    w: NonNullable<ImgixUrlQueryParams['w']>
-  },
-  breakpoints?: number[],
-  token?: string,
-) => {
+    return `${url} ${resolution}x`
+  }).join(', ')
+}
+
+type BuildFluidSrcSetArgs = {
+  url: string
+  aspectRatio: number
+  params: ImgixUrlQueryParams & { w: NonNullable<ImgixUrlQueryParams['w']> }
+  srcSetBreakpoints?: number[]
+  secureURLToken?: string
+}
+
+const buildFluidSrcSet = (args: BuildFluidSrcSetArgs) => {
+  const { url: baseURL, aspectRatio, params, secureURLToken } = args
   const { w: width } = params
+  let { srcSetBreakpoints } = args
 
-  if (!breakpoints)
-    breakpoints = DEFAULT_FLUID_BREAKPOINT_FACTORS.map((x) => width * x)
+  if (!srcSetBreakpoints)
+    srcSetBreakpoints = DEFAULT_FLUID_BREAKPOINT_FACTORS.map((x) => width * x)
 
   // Remove duplicates, sort by numerical value, and ensure maxWidth is added.
-  const uniqSortedBreakpoints = Array.from(new Set([...breakpoints, width]))
+  const uniqSortedBreakpoints = Array.from(
+    new Set([...srcSetBreakpoints, width]),
+  ).sort()
 
   return uniqSortedBreakpoints
     .map((breakpoint) => {
       if (!breakpoint) return
-      const url = buildURL(
-        baseURL,
-        {
+
+      const url = buildURL({
+        url: baseURL,
+        params: {
           ...params,
           w: breakpoint,
           h: Math.round(breakpoint / aspectRatio),
         },
-        token,
-      )
+        secureURLToken,
+      })
+
       return `${url} ${Math.round(breakpoint)}w`
     })
     .filter(Boolean)
@@ -125,43 +131,55 @@ const buildFluidSrcSet = (
 export type GatsbyImageFixedArgs = {
   width?: number
   height?: number
-  quality?: number
+  imgixParams?: ImgixUrlQueryParams
 }
 
+type BuildFixedGatsbyImageArgs = {
+  /** A valid Imgix image URL. */
+  url: string
+
+  /** Width of the source image in pixels. **/
+  sourceWidth: number
+
+  /** Height of the source image in pixels. **/
+  sourceHeight: number
+
+  /** Arguments from the GraphQL field. **/
+  args: GatsbyImageFixedArgs
+
+  /** Secure URL token to sign images if provided. **/
+  secureURLToken?: string
+}
+
+/**
+ * Builds a gatsby-image-compatible fixed image object from a base Imgix image URL.
+ *
+ * @returns gatsby-image-compatible fixed image object.
+ */
 export const buildFixedGatsbyImage = (
-  url: string,
-  sourceWidth: number,
-  sourceHeight: number,
-  args: GatsbyImageFixedArgs = {},
-  secureURLToken?: string,
+  args: BuildFixedGatsbyImageArgs,
 ): FixedObject => {
-  const { baseURL } = extractURLParts(url)
+  const { url, sourceWidth, sourceHeight, args: gqlArgs, secureURLToken } = args
 
   const aspectRatio = sourceWidth / sourceHeight
-  const width = args.width ?? DEFAULT_FIXED_WIDTH
-  const height = args.height ?? Math.round(width / aspectRatio)
-  const quality = args.quality
+  const width = gqlArgs.width ?? DEFAULT_FIXED_WIDTH
+  const height = gqlArgs.height ?? Math.round(width / aspectRatio)
 
-  const base64 = buildPlaceholderURL(baseURL, {}, secureURLToken)
-  const src = buildURL(
-    baseURL,
-    {
-      w: width,
-      h: height,
-      q: quality,
-    },
+  const base64 = buildLQIPURL({
+    url,
+    params: gqlArgs.imgixParams,
     secureURLToken,
-  )
-  const srcSet = buildFixedSrcSet(
-    baseURL,
-    {
-      w: width,
-      h: height,
-      q: quality,
-    },
-    undefined,
+  })
+  const src = buildURL({
+    url,
+    params: { ...gqlArgs.imgixParams, w: width, h: height },
     secureURLToken,
-  )
+  })
+  const srcSet = buildFixedSrcSet({
+    url,
+    params: { ...gqlArgs.imgixParams, w: width, h: height },
+    secureURLToken,
+  })
 
   return {
     base64,
@@ -179,43 +197,56 @@ export type GatsbyImageFluidArgs = {
   maxHeight?: number
   sizes?: string
   srcSetBreakpoints?: number[]
-  quality?: number
+  imgixParams?: ImgixUrlQueryParams
 }
 
-export const buildFluidGatsbyImage = (
-  url: string,
-  sourceWidth: number,
-  sourceHeight: number,
-  args: GatsbyImageFluidArgs = {},
-  secureURLToken?: string,
-): FluidObject => {
-  const aspectRatio = sourceWidth / sourceHeight
-  const width = args.maxWidth ?? DEFAULT_FLUID_MAX_WIDTH
-  const height = args.maxHeight ?? Math.round(width / aspectRatio)
-  const quality = args.quality
-  const breakpoints = args.srcSetBreakpoints
+type BuildFluidGatsbyImageArgs = {
+  /** A valid Imgix image URL. */
+  url: string
 
-  const base64 = buildPlaceholderURL(url, {}, secureURLToken)
-  const src = buildURL(
+  /** Width of the source image in pixels. */
+  sourceWidth: number
+
+  /** Height of the source image in pixels. */
+  sourceHeight: number
+
+  /** Arguments from the GraphQL field. */
+  args: GatsbyImageFluidArgs
+
+  /** Secure URL token to sign images if provided. Required for web proxy images. */
+  secureURLToken?: string
+}
+
+/**
+ * Builds a gatsby-image-compatible fluid image object from a base Imgix image URL.
+ *
+ * @returns gatsby-image-compatible fluid image object.
+ */
+export const buildFluidGatsbyImage = (
+  args: BuildFluidGatsbyImageArgs,
+): FluidObject => {
+  const { url, sourceWidth, sourceHeight, args: gqlArgs, secureURLToken } = args
+
+  const aspectRatio = sourceWidth / sourceHeight
+  const maxWidth = gqlArgs.maxWidth ?? DEFAULT_FLUID_MAX_WIDTH
+
+  const base64 = buildLQIPURL({
     url,
-    {
-      w: width,
-      h: height,
-      q: quality,
-    },
+    params: gqlArgs.imgixParams,
     secureURLToken,
-  )
-  const srcSet = buildFluidSrcSet(
+  })
+  const src = buildURL({
     url,
+    params: { ...gqlArgs.imgixParams, w: maxWidth, h: gqlArgs.maxHeight },
+    secureURLToken,
+  })
+  const srcSet = buildFluidSrcSet({
+    url,
+    params: { ...gqlArgs.imgixParams, w: maxWidth, h: gqlArgs.maxHeight },
     aspectRatio,
-    {
-      w: width,
-      h: height,
-      q: quality,
-    },
-    breakpoints,
+    srcSetBreakpoints: gqlArgs.srcSetBreakpoints,
     secureURLToken,
-  )
+  })
 
   return {
     base64,

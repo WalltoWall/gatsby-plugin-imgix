@@ -1,65 +1,58 @@
 import { Cache as GatsbyCache } from 'gatsby'
-import fetch from 'node-fetch'
 
 import {
   buildFixedGatsbyImage,
   buildFluidGatsbyImage,
   GatsbyImageFixedArgs,
   GatsbyImageFluidArgs,
-  signURL,
 } from './builders'
+import { probeMetadata } from './utils'
 
-interface ImgixMetadata {
-  PixelWidth: number
-  PixelHeight: number
+type CreateResolverArgs = {
+  cache: GatsbyCache['cache']
+  secureURLToken?: string
 }
 
-const probeMetadata = async (
+export const createFixedResolver = (args: CreateResolverArgs) => async (
   url: string,
-  cache: GatsbyCache['cache'],
-  token?: string,
+  gqlArgs: GatsbyImageFixedArgs,
 ) => {
-  const key = `metadata___${url}`
+  const { cache, secureURLToken } = args
 
-  const cached = await cache.get(key)
-  if (cached) return cached
-
-  const instance = new URL(url)
-  instance.searchParams.set('fm', 'json')
-  const jsonUrl = token ? signURL(instance.href, token) : instance.href
-
-  const res = await fetch(jsonUrl)
-  const metadata = (await res.json()) as ImgixMetadata
-
-  cache.set(key, metadata)
-
-  return metadata
-}
-
-export const createFixedResolver = (
-  cache: GatsbyCache['cache'],
-  token?: string,
-) => async (url: string, args: GatsbyImageFixedArgs) => {
   if (!url) return
 
   const {
     PixelWidth: sourceWidth,
     PixelHeight: sourceHeight,
-  } = await probeMetadata(url, cache, token)
+  } = await probeMetadata({ url, cache, secureURLToken })
 
-  return buildFixedGatsbyImage(url, sourceWidth, sourceHeight, args, token)
+  return buildFixedGatsbyImage({
+    url,
+    sourceWidth,
+    sourceHeight,
+    args: gqlArgs,
+    secureURLToken,
+  })
 }
 
-export const createFluidResolver = (
-  cache: GatsbyCache['cache'],
-  token?: string,
-) => async (url: string, args: GatsbyImageFluidArgs) => {
+export const createFluidResolver = (args: CreateResolverArgs) => async (
+  url: string,
+  gqlArgs: GatsbyImageFluidArgs,
+) => {
+  const { cache, secureURLToken } = args
+
   if (!url) return
 
   const {
     PixelWidth: sourceWidth,
     PixelHeight: sourceHeight,
-  } = await probeMetadata(url, cache, token)
+  } = await probeMetadata({ url, cache, secureURLToken })
 
-  return buildFluidGatsbyImage(url, sourceWidth, sourceHeight, args, token)
+  return buildFluidGatsbyImage({
+    url,
+    sourceWidth,
+    sourceHeight,
+    args: gqlArgs,
+    secureURLToken,
+  })
 }
