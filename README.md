@@ -29,10 +29,14 @@ module.exports = {
         // Imgix source domain. This is required.
         domain: 'example-domain.imgix.net',
 
-        // Imgix source secure URL token. Providing this will
-        // automatically secure all of your image URLs. This is required if
-        // your source type is a Web Proxy.
+        // Imgix source secure URL token. Providing this will automatically
+        // secure all of your image URLs. This is required if your source type
+        // is a Web Proxy.
         // See: https://docs.imgix.com/setup/securing-images
+        //
+        // Note that this is a private key and should be hidden behind an
+        // environment variable.
+        // See: https://www.gatsbyjs.org/docs/environment-variables/#server-side-nodejs
         secureURLToken: process.env.IMGIX_SECURE_URL_TOKEN,
 
         // Imgix source type. If your source type is a Web Proxy, set this to
