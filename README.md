@@ -53,7 +53,7 @@ module.exports = {
             nodeType: 'MarkdownRemark',
 
             // Name of the new field to create. If you set this to
-            // "featuredImage", a field at "fields.featuredImage" will be
+            // "featuredImage", a field at `fields.featuredImage` will be
             // created.
             fieldName: 'featuredImage',
 
@@ -74,8 +74,8 @@ module.exports = {
 Fields setup in your configuration are copied into a `fields` property on the
 image's node.
 
-For example, a `ShopifyProduct` node with an image field name called
-`featuredImage` could be queried like the following:
+For example, a `ShopifyProduct` node with an image field named `featuredImage`
+could be queried like the following:
 
 ```graphql
 query {
@@ -106,13 +106,14 @@ information.
 ### Query responsive images
 
 Responsive images to display using [`gatsby-image`][gatsby-image] can be queried
-using the `fixed` or `fluid` field and a GraphQL fragment. Use this pattern,
-where `...ImageFragment` is one of the following fragments:
+using the `fixed` or `fluid` field.
 
-- GatsbyImgixFixed
-- GatsbyImgixFixed_noBase64
-- GatsbyImgixFluid
-- GatsbyImgixFluid_noBase64
+Use this pattern, where `...ImageFragment` is one of the following fragments:
+
+- `GatsbyImgixFixed`
+- `GatsbyImgixFixed_noBase64`
+- `GatsbyImgixFluid`
+- `GatsbyImgixFluid_noBase64`
 
 Learn about the different types of responsive images and fragments from
 [`gatsby-image`’s official docs][gatsby-image].
@@ -137,7 +138,7 @@ query {
 Full example:
 
 ```graphql
-{
+query {
   allShopifyProduct {
     nodes {
       id
@@ -157,10 +158,13 @@ Full example:
 
 ### For plugin developers
 
-`gatsby-plugin-imgix` can be used to provide gatsby-image support to your
-Imgix-backed plugin. Source plugins that serve Imgix URLs, such as
-`gatsby-source-prismic`, use this plugin for drop-in support of GraphQL-based
+`gatsby-plugin-imgix` can be used to provide [`gatsby-image`][gatsby-image]
+support to your Imgix-backed plugin. Source plugins that serve Imgix URLs, such
+as `gatsby-source-prismic`, use this plugin for drop-in support of GraphQL-based
 image transformations.
+
+The following plugins use `gatsby-plugin-imgix`:
+[`gatsby-source-prismic`][gatsby-source-prismic]
 
 _Docs coming soon_
 
@@ -168,3 +172,4 @@ _Docs coming soon_
 [gatsby-createnodefield]: https://www.gatsbyjs.org/docs/actions/#createNodeField
 [gatsby-image]: https://www.gatsbyjs.org/packages/gatsby-image/
 [prismic]: https://prismic.io/
+[gatsby-source-prismic]: https://github.com/angeloashmore/gatsby-source-prismic
