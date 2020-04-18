@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.2.0...v0.3.0) (2020-04-18)
+
+
+### Features
+
+* download lqip as base64 url ([0f20ea2](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/0f20ea2e3b0f30c2801251fc06942c20e41af028))
+
 ## [0.2.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.1.0...v0.2.0) (2020-04-17)
 
 
