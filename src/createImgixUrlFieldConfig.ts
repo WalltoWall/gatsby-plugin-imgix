@@ -4,11 +4,11 @@ import {
   GraphQLString,
 } from 'gatsby/graphql'
 
+import { buildImgixUrl } from './urlBuilders'
 import {
   ImgixResolveUrl,
   ImgixUrlParams,
   ImgixUrlParamsInputType,
-  buildImgixUrl,
 } from './shared'
 
 export interface ImgixUrlArgs {
@@ -21,12 +21,14 @@ const imgixUrlArgs = {
 
 interface CreateImgixUrlFieldConfigArgs<TSource> {
   resolveUrl: ImgixResolveUrl<TSource>
-  secureURLToken?: string
+  secureUrlToken?: string
+  defaultImgixParams?: ImgixUrlParams
 }
 
 export const createImgixUrlFieldConfig = <TSource, TContext>({
   resolveUrl,
-  secureURLToken,
+  secureUrlToken,
+  defaultImgixParams,
 }: CreateImgixUrlFieldConfigArgs<TSource>): GraphQLFieldConfig<
   TSource,
   TContext,
@@ -38,6 +40,12 @@ export const createImgixUrlFieldConfig = <TSource, TContext>({
     const url = await resolveUrl(obj)
     if (!url) return
 
-    buildImgixUrl(url, secureURLToken)(args.imgixParams)
+    return buildImgixUrl(
+      url,
+      secureUrlToken,
+    )({
+      ...defaultImgixParams,
+      ...args.imgixParams,
+    })
   },
 })

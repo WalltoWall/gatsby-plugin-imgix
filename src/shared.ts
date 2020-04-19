@@ -4,10 +4,9 @@ import {
   GraphQLInputObjectType,
   GraphQLInt,
 } from 'gatsby/graphql'
-import { buildImgixUrl as _buildImgixUrl, ImgixUrlQueryParams } from 'ts-imgix'
-import { createHash } from 'crypto'
 import fetch from 'node-fetch'
 
+import { buildImgixUrl } from './urlBuilders'
 import { Nullable, OptionalPromise } from './utils'
 
 export interface ImgixUrlParams {
@@ -29,22 +28,6 @@ export type ImgixResolveUrl<TSource> = (
   obj: TSource,
 ) => OptionalPromise<Nullable<string>>
 
-export const buildImgixUrl = (url: string, token?: string) => (
-  params: ImgixUrlQueryParams,
-) => {
-  const imgixUrl = _buildImgixUrl(url)(params)
-  const parsed = new URL(imgixUrl)
-
-  const signatureBase = token + parsed.pathname + parsed.search
-  const signature = createHash('md5')
-    .update(signatureBase)
-    .digest('hex')
-
-  parsed.searchParams.append('s', signature)
-
-  return parsed.href
-}
-
 interface ImgixMetadata {
   'Content-Type': string
   PixelWidth: number
@@ -54,19 +37,23 @@ interface ImgixMetadata {
 interface GetImgixMetadataArgs {
   url: string
   cache: Cache['cache']
-  secureURLToken?: string
+  secureUrlToken?: string
 }
 
 export const fetchImgixMetadata = async ({
   url,
   cache,
-  secureURLToken,
+  secureUrlToken,
 }: GetImgixMetadataArgs): Promise<ImgixMetadata> => {
   const cacheKey = `gatsby-plugin-imgix-metadata-${url}`
   const cached = await cache.get(cacheKey)
   if (cached) return cached
 
-  const jsonUrl = buildImgixUrl(url, secureURLToken)({ fm: 'json' })
+  const instance = new URL(url)
+  instance.searchParams.set('fm', 'json')
+  const unsignedJsonUrl = instance.href
+
+  const jsonUrl = buildImgixUrl(unsignedJsonUrl, secureUrlToken)({})
   const res = await fetch(jsonUrl)
   const metadata = (await res.json()) as ImgixMetadata
 
@@ -78,13 +65,13 @@ export const fetchImgixMetadata = async ({
 interface FetchImgixBase64UrlArgs {
   url: string
   cache: Cache['cache']
-  secureURLToken?: string
+  secureUrlToken?: string
 }
 
 export const fetchImgixBase64Url = async ({
   url,
   cache,
-  secureURLToken,
+  secureUrlToken,
 }: FetchImgixBase64UrlArgs): Promise<string> => {
   const cacheKey = `gatsby-plugin-imgix-base64-url-${url}`
   const cachedValue = await cache.get(cacheKey)
@@ -94,7 +81,7 @@ export const fetchImgixBase64Url = async ({
   const buffer = await res.buffer()
   const base64 = buffer.toString('base64')
 
-  const metadata = await fetchImgixMetadata({ url, cache, secureURLToken })
+  const metadata = await fetchImgixMetadata({ url, cache, secureUrlToken })
   const base64URL = `data:${metadata['Content-Type']};base64,${base64}`
 
   cache.set(cacheKey, base64URL)

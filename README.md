@@ -37,7 +37,7 @@ module.exports = {
         // Note that this is a private key and should be hidden behind an
         // environment variable.
         // See: https://www.gatsbyjs.org/docs/environment-variables/#server-side-nodejs
-        secureURLToken: process.env.IMGIX_SECURE_URL_TOKEN,
+        secureUrlToken: process.env.IMGIX_SECURE_URL_TOKEN,
 
         // Imgix source type. If your source type is a Web Proxy, set this to
         // "webProxy". Otherwise, you may omit this field. URLs provided to the
