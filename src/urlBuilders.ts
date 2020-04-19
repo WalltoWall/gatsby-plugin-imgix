@@ -1,6 +1,4 @@
-import { buildImgixUrl, ImgixUrlQueryParams, ImgixFit } from 'ts-imgix'
-
-import { signURL } from './utils'
+import { buildImgixUrl } from './shared'
 
 // Resolutions for `fixed` images. Same as `gatsby-plugin-sharp`.
 const FIXED_RESOLUTIONS = [1, 1.5, 2]
@@ -21,20 +19,6 @@ const DEFAULT_LQIP_PARAMS: ImgixUrlQueryParams = {
   blur: 15,
   q: 20,
 }
-
-type BuildURLArgs = {
-  url: string
-  params?: ImgixUrlQueryParams
-  secureURLToken?: string
-}
-
-export const buildURL = ({ url, params, secureURLToken }: BuildURLArgs) => {
-  const imgixURL = buildImgixUrl(url)({ ...DEFAULT_PARAMS, ...params })
-
-  return secureURLToken ? signURL(imgixURL, secureURLToken) : imgixURL
-}
-
-type BuildPlaceholderURLArgs = BuildURLArgs
 
 export const buildLQIPURL = (args: BuildPlaceholderURLArgs) =>
   buildURL({
