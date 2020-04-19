@@ -83,7 +83,7 @@ type BuildFixedGatsbyImageArgs = {
   sourceHeight: number
 
   /** Arguments from the GraphQL field. **/
-  args: GatsbyImageFixedArgs
+  args?: GatsbyImageFixedArgs
 
   /** Secure URL token to sign images if provided. **/
   secureURLToken?: string
@@ -98,7 +98,7 @@ export const buildFixedGatsbyImage = ({
   url,
   sourceWidth,
   sourceHeight,
-  args,
+  args = {},
   secureURLToken,
 }: BuildFixedGatsbyImageArgs): FixedObject => {
   const aspectRatio = sourceWidth / sourceHeight

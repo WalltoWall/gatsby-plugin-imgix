@@ -12,6 +12,12 @@ import { createFixedResolver, createFixedType } from './fixed'
 import { createFluidResolver, createFluidType } from './fluid'
 import { invariant, transformUrlForWebProxy } from './utils'
 
+import {
+  createImgixUrlFieldConfig,
+  createImgixFixedFieldConfig,
+  createImgixFluidFieldConfig,
+} from './pyramid'
+
 enum ImgixSourceType {
   AmazonS3 = 's3',
   GoogleCloudStorange = 'gcs',
@@ -140,53 +146,28 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
       name: `${fieldOptions.nodeType}Fields`,
       fields: {
         [fieldOptions.fieldName]:
-          'getUrls' in fieldOptions ? '[ImgixImageType]' : 'ImgixImageType',
+          'getUrls' in fieldOptions ? '[ImgixImage]' : 'ImgixImage',
       },
     }),
   )
 
   createTypes([
     ...fieldTypes,
-    createFluidType({
-      cache,
-      schema,
-      secureURLToken: pluginOptions.secureURLToken,
-    }),
-    createFixedType({
-      cache,
-      schema,
-      secureURLToken: pluginOptions.secureURLToken,
-    }),
     schema.buildObjectType({
-      name: 'ImgixImageType',
+      name: 'ImgixImage',
       fields: {
-        url: 'String',
-        fixed: {
-          type: 'ImgixImageFixedType',
-          args: {
-            width: 'Int',
-            height: 'Int',
-            // imgixParams: '',
-          },
-          resolve: createFixedResolver({
-            cache,
-            secureURLToken: pluginOptions.secureURLToken,
-          }),
-        },
-        fluid: {
-          type: 'ImgixImageFluidType',
-          args: {
-            maxWidth: 'Int',
-            maxHeight: 'Int',
-            sizes: 'String',
-            srcSetBreakpoints: '[Int!]',
-            // imgixParams: '',
-          },
-          resolve: createFluidResolver({
-            cache,
-            secureURLToken: pluginOptions.secureURLToken,
-          }),
-        },
+        url: createImgixUrlFieldConfig({
+          resolveUrl: (url: string) => url,
+          secureURLToken: pluginOptions.secureURLToken,
+        }),
+        fixed: createImgixFixedFieldConfig({
+          resolveUrl: (url: string) => url,
+          secureURLToken: pluginOptions.secureURLToken,
+        }),
+        fluid: createImgixFluidFieldConfig({
+          resolveUrl: (url: string) => url,
+          secureURLToken: pluginOptions.secureURLToken,
+        }),
       },
     }),
   ])

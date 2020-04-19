@@ -38,6 +38,7 @@
     "@types/node-fetch": "^2.5.6",
     "gatsby": "^2.20.24",
     "gatsby-image": "^2.3.4",
+    "graphql-compose": "^7.14.1",
     "husky": "^4.2.5",
     "standard-version": "^7.1.0",
     "tsdx": "^0.13.2",

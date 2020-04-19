@@ -85,7 +85,7 @@ type BuildFluidGatsbyImageArgs = {
   sourceHeight: number
 
   /** Arguments from the GraphQL field. */
-  args: GatsbyImageFluidArgs
+  args?: GatsbyImageFluidArgs
 
   /** Secure URL token to sign images if provided. Required for web proxy images. */
   secureURLToken?: string
@@ -100,7 +100,7 @@ export const buildFluidGatsbyImage = ({
   url,
   sourceWidth,
   sourceHeight,
-  args,
+  args = {},
   secureURLToken,
 }: BuildFluidGatsbyImageArgs): FluidObject => {
   const aspectRatio = sourceWidth / sourceHeight
