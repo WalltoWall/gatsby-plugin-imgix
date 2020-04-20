@@ -23,6 +23,8 @@ export const buildImgixUrl = (url: string, secureUrlToken?: string) => (
   const imgixUrl = _buildImgixUrl(url)(params)
   const parsed = new URL(imgixUrl)
 
+  parsed.searchParams.delete('s')
+
   const signatureBase = secureUrlToken + parsed.pathname + parsed.search
   const signature = createHash('md5')
     .update(signatureBase)
