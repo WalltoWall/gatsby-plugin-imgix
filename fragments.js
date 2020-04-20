@@ -1,7 +1,7 @@
 import { graphql } from 'gatsby'
 
 export const GatsbyImgixFixedType = graphql`
-  fragment GatsbyImgixFixed on ImgixImageFixedType {
+  fragment GatsbyImgixFixed on ImgixFluid {
     base64
     width
     height
@@ -13,7 +13,7 @@ export const GatsbyImgixFixedType = graphql`
 `
 
 export const GatsbyImgixFixed_noBase64 = graphql`
-  fragment GatsbyImgixFixed_noBase64 on ImgixImageFixedType {
+  fragment GatsbyImgixFixed_noBase64 on ImgixFluid {
     width
     height
     src
@@ -26,7 +26,7 @@ export const GatsbyImgixFixed_noBase64 = graphql`
 // Not actually necessary - since Imgix is scaling,
 // there is no "penalty" for including WebP by default
 export const GatsbyImgixFixed_withWebp = graphql`
-  fragment GatsbyImgixFixed_withWebp on ImgixImageFixedType {
+  fragment GatsbyImgixFixed_withWebp on ImgixFluid {
     base64
     width
     height
@@ -40,7 +40,7 @@ export const GatsbyImgixFixed_withWebp = graphql`
 // Not actually necessary - since Imgix is scaling,
 // there is no "penalty" for including WebP by default
 export const GatsbyImgixFixed_withWebp_noBase64 = graphql`
-  fragment GatsbyImgixFixed_withWebp_noBase64 on ImgixImageFixedType {
+  fragment GatsbyImgixFixed_withWebp_noBase64 on ImgixFluid {
     width
     height
     src
@@ -51,7 +51,7 @@ export const GatsbyImgixFixed_withWebp_noBase64 = graphql`
 `
 
 export const GatsbyImgixFluidType = graphql`
-  fragment GatsbyImgixFluid on ImgixImageFluidType {
+  fragment GatsbyImgixFluid on ImgixFluid {
     base64
     aspectRatio
     src
@@ -63,7 +63,7 @@ export const GatsbyImgixFluidType = graphql`
 `
 
 export const GatsbyImgixFluid_noBase64 = graphql`
-  fragment GatsbyImgixFluid_noBase64 on ImgixImageFluidType {
+  fragment GatsbyImgixFluid_noBase64 on ImgixFluid {
     aspectRatio
     src
     srcSet
@@ -76,7 +76,7 @@ export const GatsbyImgixFluid_noBase64 = graphql`
 // Not actually necessary - since Imgix is scaling,
 // there is no "penalty" for including WebP by default
 export const GatsbyImgixFluid_withWebp = graphql`
-  fragment GatsbyImgixFluid_withWebp on ImgixImageFluidType {
+  fragment GatsbyImgixFluid_withWebp on ImgixFluid {
     base64
     aspectRatio
     src
@@ -90,7 +90,7 @@ export const GatsbyImgixFluid_withWebp = graphql`
 // Not actually necessary - since Imgix is scaling,
 // there is no "penalty" for including WebP by default
 export const GatsbyImgixFluid_withWebp_noBase64 = graphql`
-  fragment GatsbyImgixFluid_withWebp_noBase64 on ImgixImageFluidType {
+  fragment GatsbyImgixFluid_withWebp_noBase64 on ImgixFluid {
     aspectRatio
     src
     srcSet
