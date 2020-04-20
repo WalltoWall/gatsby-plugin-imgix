@@ -59,10 +59,10 @@ module.exports = {
             // created.
             fieldName: 'featuredImage',
 
-            // Path to the URL in the node. One of `urlPath`, `getUrl`, or
-            // `getUrls` may be provided to fetch a single URL or an array of
-            // URLs depending on the option provided.
-            urlPath: 'frontmatter.featured_image',
+            // Function to get the URL in the node. This function should return
+            // the URL as a string. If your field contains an array of URLs,
+            // change the `getUrl` option name to `getUrls`.
+            getUrl: node => node.frontmatter.featured_image,
           },
         ],
       },
