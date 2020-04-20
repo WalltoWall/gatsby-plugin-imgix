@@ -35,8 +35,8 @@ export const buildImgixUrl = (url: string, secureUrlToken?: string) => (
   return parsed.href
 }
 
-const buildImgixLqipUrl: typeof buildImgixUrl = (...args1) => params =>
-  buildImgixUrl(...args1)({ ...DEFAULT_LQIP_PARAMS, ...params })
+const buildImgixLqipUrl: typeof buildImgixUrl = (...args) => params =>
+  buildImgixUrl(...args)({ ...params, ...DEFAULT_LQIP_PARAMS })
 
 const buildImgixFixedSrcSet = (baseUrl: string, secureUrlToken?: string) => (
   params: ImgixUrlQueryParams,
