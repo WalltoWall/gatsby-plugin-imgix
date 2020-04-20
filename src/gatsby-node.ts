@@ -115,7 +115,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
   gatsbyContext: CreateSchemaCustomizationArgs,
   pluginOptions: PluginOptions,
 ) => {
-  const { actions, cache, reporter } = gatsbyContext
+  const { actions, cache, schema, reporter } = gatsbyContext
   const { createTypes } = actions
 
   const {
@@ -161,22 +161,22 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
     },
   })
 
-  const fieldTypes = fields.map(
-    fieldOptions =>
-      new GraphQLObjectType({
-        name: `${fieldOptions.nodeType}Fields`,
-        fields: {
-          [fieldOptions.fieldName]: {
-            type:
-              'getUrls' in fieldOptions
-                ? new GraphQLList(ImgixImageType)
-                : ImgixImageType,
-          },
+  const fieldTypes = fields.map(fieldOptions =>
+    schema.buildObjectType({
+      name: `${fieldOptions.nodeType}Fields`,
+      fields: {
+        [fieldOptions.fieldName]: {
+          type:
+            'getUrls' in fieldOptions
+              ? new GraphQLList(ImgixImageType)
+              : ImgixImageType,
         },
-      }),
+      },
+    }),
   )
 
-  createTypes([ImgixImageType, ...fieldTypes])
+  createTypes(ImgixImageType)
+  createTypes(fieldTypes)
 }
 
 export const onPreExtractQueries: GatsbyNode['onPreExtractQueries'] = gatsbyContext => {
