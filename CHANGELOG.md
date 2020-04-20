@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.3.0...v0.4.0) (2020-04-20)
+
+
+### Features
+
+* restructure programmatic API ([#3](https://github.com/WalltoWall/gatsby-plugin-imgix/issues/3)) ([c884b7e](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/c884b7e8682bf61375d1c81446824cab10a6b9eb))
+
 ## [0.3.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.2.0...v0.3.0) (2020-04-18)
 
 
