@@ -11,7 +11,7 @@ import {
 } from 'gatsby/graphql'
 
 import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
-import { buildImgixFluid, DEFAULT_FLUID_MAX_WIDTH } from './urlBuilders'
+import { buildImgixFluid, DEFAULT_FLUID_MAX_WIDTH } from './builders'
 import {
   ImgixResolveUrl,
   ImgixUrlParams,

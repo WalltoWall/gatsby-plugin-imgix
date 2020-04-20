@@ -4,7 +4,7 @@ import {
   GraphQLString,
 } from 'gatsby/graphql'
 
-import { buildImgixUrl } from './urlBuilders'
+import { buildImgixUrl } from './builders'
 import {
   ImgixResolveUrl,
   ImgixUrlParams,

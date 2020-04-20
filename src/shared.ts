@@ -6,7 +6,7 @@ import {
 } from 'gatsby/graphql'
 import fetch from 'node-fetch'
 
-import { buildImgixUrl } from './urlBuilders'
+import { buildImgixUrl } from './builders'
 import { Nullable, OptionalPromise } from './utils'
 
 export interface ImgixUrlParams {

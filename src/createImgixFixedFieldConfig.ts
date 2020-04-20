@@ -9,7 +9,7 @@ import {
 } from 'gatsby/graphql'
 
 import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
-import { buildImgixFixed, DEFAULT_FIXED_WIDTH } from './urlBuilders'
+import { buildImgixFixed, DEFAULT_FIXED_WIDTH } from './builders'
 import {
   ImgixResolveUrl,
   ImgixUrlParams,
