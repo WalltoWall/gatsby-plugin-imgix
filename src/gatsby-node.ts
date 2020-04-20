@@ -1,16 +1,18 @@
 import fs from 'fs'
 import path from 'path'
-import dlv from 'dlv'
 import {
   GatsbyNode,
   CreateSchemaCustomizationArgs,
   Node,
   PluginOptions as GatsbyPluginOptions,
 } from 'gatsby'
+import { GraphQLObjectType, GraphQLList } from 'gatsby/graphql'
 
-import { createFixedResolver, createFixedType } from './fixed'
-import { createFluidResolver, createFluidType } from './fluid'
-import { invariant, transformUrlForWebProxy } from './utils'
+import { createImgixUrlFieldConfig } from './createImgixUrlFieldConfig'
+import { createImgixFixedFieldConfig } from './createImgixFixedFieldConfig'
+import { createImgixFluidFieldConfig } from './createImgixFluidFieldConfig'
+import { invariant, transformUrlForWebProxy, ns } from './utils'
+import { ImgixUrlParams } from './shared'
 
 enum ImgixSourceType {
   AmazonS3 = 's3',
@@ -20,25 +22,27 @@ enum ImgixSourceType {
   WebProxy = 'webProxy',
 }
 
-type FieldOptions = {
+interface BaseFieldOptions {
   nodeType: string
   fieldName: string
-} & (
-  | {
-      urlPath: string
-    }
-  | {
-      getUrl: (node: Node) => string
-    }
-  | {
-      getUrls: (node: Node) => string[]
-    }
-)
+}
+
+interface FieldOptionsSingleUrl extends BaseFieldOptions {
+  getUrl: (node: Node) => string
+}
+
+interface FieldOptionsMultipleUrls extends BaseFieldOptions {
+  getUrls: (node: Node) => string
+}
+
+type FieldOptions = FieldOptionsSingleUrl | FieldOptionsMultipleUrls
 
 interface PluginOptions extends GatsbyPluginOptions {
   domain?: string
-  secureURLToken?: string
+  secureUrlToken?: string
   sourceType?: ImgixSourceType
+  namespace?: string
+  defaultImgixParams?: ImgixUrlParams
   fields?: FieldOptions[]
 }
 
@@ -49,24 +53,22 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = async (
   const { node, actions, reporter } = gatsbyContext
   const { createNodeField } = actions
 
-  pluginOptions = { fields: [], ...pluginOptions }
+  const { domain, secureUrlToken, sourceType, fields = [] } = pluginOptions
   invariant(
-    Array.isArray(pluginOptions.fields),
+    Array.isArray(fields),
     'fields must be an array of field options',
     reporter,
   )
 
-  const fieldOptions = pluginOptions.fields.filter(
+  const fieldOptions = fields.filter(
     fieldOptions => fieldOptions.nodeType === node.internal.type,
   )
   if (fieldOptions.length < 1) return
 
   for (const field of fieldOptions) {
-    let fieldValue: string | string[] | undefined = undefined
+    let fieldValue = undefined as string | string[] | undefined
 
-    if ('urlPath' in field) {
-      fieldValue = dlv(node, field.urlPath) ?? undefined
-    } else if ('getUrl' in field) {
+    if ('getUrl' in field) {
       fieldValue = field.getUrl(node)
       invariant(
         fieldValue === undefined ||
@@ -82,22 +84,18 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = async (
         'getUrls must return an array of URLs',
         reporter,
       )
-    } else {
-      invariant(
-        false,
-        `one of urlPath, getUrl, or getUrls must be provided in the ${field.nodeType}.fields.${field.fieldName} options`,
-        reporter,
-      )
     }
 
-    if (fieldValue && pluginOptions.sourceType === ImgixSourceType.WebProxy) {
+    if (!fieldValue) continue
+
+    if (sourceType === ImgixSourceType.WebProxy) {
       invariant(
-        pluginOptions.domain !== undefined,
+        domain !== undefined,
         'an Imgix domain must be provided if sourceType is webProxy',
         reporter,
       )
       invariant(
-        pluginOptions.secureURLToken !== undefined,
+        secureUrlToken !== undefined,
         'a secure URL token must be provided if sourceType is webProxy',
         reporter,
       )
@@ -106,12 +104,10 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = async (
         fieldValue = fieldValue.map(url =>
           transformUrlForWebProxy(url, pluginOptions.domain!),
         )
-      else
-        fieldValue = transformUrlForWebProxy(fieldValue, pluginOptions.domain)
+      else fieldValue = transformUrlForWebProxy(fieldValue, domain)
     }
 
-    if (fieldValue)
-      createNodeField({ node, name: field.fieldName, value: fieldValue })
+    createNodeField({ node, name: field.fieldName, value: fieldValue })
   }
 }
 
@@ -119,77 +115,68 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
   gatsbyContext: CreateSchemaCustomizationArgs,
   pluginOptions: PluginOptions,
 ) => {
-  const { actions, schema, cache, reporter } = gatsbyContext
+  const { actions, cache, schema, reporter } = gatsbyContext
   const { createTypes } = actions
 
-  pluginOptions = { fields: [], ...pluginOptions }
+  const {
+    secureUrlToken,
+    sourceType,
+    namespace,
+    defaultImgixParams,
+    fields = [],
+  } = pluginOptions
   invariant(
-    Array.isArray(pluginOptions.fields),
+    Array.isArray(fields),
     'fields must be an array of field options',
     reporter,
   )
   invariant(
-    pluginOptions.sourceType !== ImgixSourceType.WebProxy ||
-      Boolean(pluginOptions.secureURLToken),
+    sourceType !== ImgixSourceType.WebProxy || Boolean(secureUrlToken),
     'a secure URL token must be provided if sourceType is webProxy',
     reporter,
   )
 
-  const fieldTypes = pluginOptions.fields.map(fieldOptions =>
+  const ImgixImageType = new GraphQLObjectType<string, unknown, any>({
+    name: ns(namespace, 'ImgixImage'),
+    fields: {
+      url: createImgixUrlFieldConfig({
+        resolveUrl: url => url,
+        defaultImgixParams,
+        secureUrlToken,
+      }),
+      fixed: createImgixFixedFieldConfig({
+        resolveUrl: url => url,
+        secureUrlToken,
+        namespace,
+        defaultImgixParams,
+        cache,
+      }),
+      fluid: createImgixFluidFieldConfig({
+        resolveUrl: url => url,
+        secureUrlToken: secureUrlToken,
+        namespace,
+        defaultImgixParams,
+        cache,
+      }),
+    },
+  })
+
+  const fieldTypes = fields.map(fieldOptions =>
     schema.buildObjectType({
       name: `${fieldOptions.nodeType}Fields`,
       fields: {
-        [fieldOptions.fieldName]:
-          'getUrls' in fieldOptions ? '[ImgixImageType]' : 'ImgixImageType',
+        [fieldOptions.fieldName]: {
+          type:
+            'getUrls' in fieldOptions
+              ? new GraphQLList(ImgixImageType)
+              : ImgixImageType,
+        },
       },
     }),
   )
 
-  createTypes([
-    ...fieldTypes,
-    createFluidType({
-      cache,
-      schema,
-      secureURLToken: pluginOptions.secureURLToken,
-    }),
-    createFixedType({
-      cache,
-      schema,
-      secureURLToken: pluginOptions.secureURLToken,
-    }),
-    schema.buildObjectType({
-      name: 'ImgixImageType',
-      fields: {
-        url: 'String',
-        fixed: {
-          type: 'ImgixImageFixedType',
-          args: {
-            width: 'Int',
-            height: 'Int',
-            // imgixParams: '',
-          },
-          resolve: createFixedResolver({
-            cache,
-            secureURLToken: pluginOptions.secureURLToken,
-          }),
-        },
-        fluid: {
-          type: 'ImgixImageFluidType',
-          args: {
-            maxWidth: 'Int',
-            maxHeight: 'Int',
-            sizes: 'String',
-            srcSetBreakpoints: '[Int!]',
-            // imgixParams: '',
-          },
-          resolve: createFluidResolver({
-            cache,
-            secureURLToken: pluginOptions.secureURLToken,
-          }),
-        },
-      },
-    }),
-  ])
+  createTypes(ImgixImageType)
+  createTypes(fieldTypes)
 }
 
 export const onPreExtractQueries: GatsbyNode['onPreExtractQueries'] = gatsbyContext => {
