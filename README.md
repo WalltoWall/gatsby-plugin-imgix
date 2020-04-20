@@ -1,8 +1,10 @@
 # gatsby-plugin-imgix
 
 Gatsby plugin which enables the use of [Imgix][imgix] to apply image
-transformations at request-time. For most cases, this can replace the use of
-`gatsby-transformer-sharp` and speed up your build times significantly.
+transformations at request-time.
+
+For most cases, this plugin can replace the use of `gatsby-transformer-sharp`
+and speed up your build times significantly.
 
 Learn more about [Imgix on their site][imgix].
 
@@ -77,6 +79,10 @@ image's node.
 For example, a `ShopifyProduct` node with an image field named `featuredImage`
 could be queried like the following:
 
+**Note**: Learn to use the GraphQL tool and Ctrl+Spacebar at
+<http://localhost:8000/___graphql> to discover the types and properties of your
+GraphQL model.
+
 ```graphql
 query {
   allShopifyProduct {
@@ -101,14 +107,31 @@ information.
 
 ### Query image URLs with transformations
 
-**Not yet implemented**
+Imgix image transformations are applied via URL parameters. The `url` field
+accepts an `imgixParams` argument to build a URL with the provided parameters.
+
+```graphql
+query {
+  allShopifyProduct {
+    nodes {
+      id
+      fields {
+        featuredImage {
+          # 800px width and grayscale
+          url(imgixParams: { w: 800, sat: -100 })
+        }
+      }
+    }
+  }
+}
+```
 
 ### Query responsive images
 
 Responsive images to display using [`gatsby-image`][gatsby-image] can be queried
 using the `fixed` or `fluid` field.
 
-Use this pattern, where `...ImageFragment` is one of the following fragments:
+Use this pattern where `...ImageFragment` is one of the following fragments:
 
 - `GatsbyImgixFixed`
 - `GatsbyImgixFixed_noBase64`
@@ -156,6 +179,20 @@ query {
 
 ## Programmatic use
 
+### Building `gatsby-image` fixed and fluid objects
+
+The following functions are provided to build a `gatsby-image`-compatible object
+for `fixed` and `fluid` responsive images. These functions are used internally
+by this plugin to build the `gatsby-image` objects.
+
+#### buildImgixFixed
+
+_Docs coming soon_
+
+#### buildImgixFluid
+
+_Docs coming soon_
+
 ### For plugin developers
 
 `gatsby-plugin-imgix` can be used to provide [`gatsby-image`][gatsby-image]
@@ -164,7 +201,21 @@ as `gatsby-source-prismic`, use this plugin for drop-in support of GraphQL-based
 image transformations.
 
 The following plugins use `gatsby-plugin-imgix`:
-[`gatsby-source-prismic`][gatsby-source-prismic]
+
+- [`gatsby-source-prismic`][gatsby-source-prismic]
+
+The following functions can be used to integrate `gatsby-plugin-imgix` with your
+plugin.
+
+#### createImgixUrlFieldConfig
+
+_Docs coming soon_
+
+#### createImgixFixedFieldConfig
+
+_Docs coming soon_
+
+#### createImgixFluidFieldConfig
 
 _Docs coming soon_
 
