@@ -9,11 +9,6 @@ import fetch from 'node-fetch'
 import { buildImgixUrl } from './builders'
 import { Nullable, OptionalPromise } from './utils'
 
-export interface ImgixUrlParams {
-  w?: number
-  h?: number
-}
-
 export const imgixUrlParams = {
   w: { type: GraphQLInt },
   h: { type: GraphQLInt },

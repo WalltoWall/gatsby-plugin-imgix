@@ -12,17 +12,11 @@ import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
 import { buildImgixFixed, DEFAULT_FIXED_WIDTH } from './builders'
 import {
   ImgixResolveUrl,
-  ImgixUrlParams,
   ImgixUrlParamsInputType,
   fetchImgixMetadata,
 } from './shared'
 import { ns } from './utils'
-
-export interface ImgixFixedArgs {
-  width: number
-  height?: number
-  imgixParams: ImgixUrlParams
-}
+import { ImgixFixedArgs, ImgixUrlParams } from './types'
 
 const imgixFixedArgs = {
   width: { type: GraphQLInt, defaultValue: DEFAULT_FIXED_WIDTH },

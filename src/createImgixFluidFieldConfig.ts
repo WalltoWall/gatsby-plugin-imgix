@@ -14,18 +14,11 @@ import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
 import { buildImgixFluid, DEFAULT_FLUID_MAX_WIDTH } from './builders'
 import {
   ImgixResolveUrl,
-  ImgixUrlParams,
   ImgixUrlParamsInputType,
   fetchImgixMetadata,
 } from './shared'
 import { ns } from './utils'
-
-export interface ImgixFluidArgs {
-  maxWidth: number
-  maxHeight?: number
-  srcSetBreakpoints?: number[]
-  imgixParams: ImgixUrlParams
-}
+import { ImgixFluidArgs, ImgixUrlParams } from './types'
 
 const imgixFluidArgs = {
   maxWidth: { type: GraphQLInt, defaultValue: DEFAULT_FLUID_MAX_WIDTH },

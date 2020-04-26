@@ -2,8 +2,7 @@ import { FixedObject, FluidObject } from 'gatsby-image'
 import { buildImgixUrl as _buildImgixUrl, ImgixUrlQueryParams } from 'ts-imgix'
 import { createHash } from 'crypto'
 
-import { ImgixFixedArgs } from './createImgixFixedFieldConfig'
-import { ImgixFluidArgs } from './createImgixFluidFieldConfig'
+import { ImgixFixedArgs, ImgixFluidArgs } from './types'
 
 export const DEFAULT_FIXED_WIDTH = 400
 export const DEFAULT_FLUID_MAX_WIDTH = 800
@@ -58,7 +57,7 @@ type BuildImgixFixedArgs = {
   sourceWidth: number
   sourceHeight: number
   secureUrlToken?: string
-  args: ImgixFixedArgs
+  args?: ImgixFixedArgs
 }
 
 /**
@@ -71,13 +70,28 @@ export const buildImgixFixed = ({
   sourceWidth,
   sourceHeight,
   secureUrlToken,
-  args,
+  args = {},
 }: BuildImgixFixedArgs): FixedObject => {
   const aspectRatio = sourceWidth / sourceHeight
-  const width = args.width ?? DEFAULT_FIXED_WIDTH
-  const height = args.height ?? Math.round(width / aspectRatio)
 
-  const base64 = buildImgixLqipUrl(url, secureUrlToken)(args.imgixParams)
+  let width: number
+  let height: number
+
+  if (args.width != undefined && args.height != undefined) {
+    width = args.width
+    height = args.height
+  } else if (args.width != undefined) {
+    width = args.width
+    height = Math.round(width / aspectRatio)
+  } else if (args.height != undefined) {
+    width = Math.round(args.height * aspectRatio)
+    height = args.height
+  } else {
+    width = DEFAULT_FIXED_WIDTH
+    height = Math.round(width / aspectRatio)
+  }
+
+  const base64 = buildImgixLqipUrl(url, secureUrlToken)(args.imgixParams ?? {})
   const src = buildImgixUrl(
     url,
     secureUrlToken,
@@ -114,7 +128,7 @@ const buildImgixFluidSrcSet = (baseUrl: string, secureUrlToken?: string) => (
   // Remove duplicates, sort by numerical value, and ensure maxWidth is added.
   const uniqSortedBreakpoints = Array.from(
     new Set([...srcSetBreakpoints, maxWidth]),
-  ).sort()
+  ).sort((a, b) => a - b)
 
   return uniqSortedBreakpoints
     .map(breakpoint => {
@@ -137,7 +151,7 @@ type BuildImgixFluidArgs = {
   sourceWidth: number
   sourceHeight: number
   secureUrlToken?: string
-  args: ImgixFluidArgs
+  args?: ImgixFluidArgs
 }
 
 /**
@@ -150,12 +164,12 @@ export const buildImgixFluid = ({
   sourceWidth,
   sourceHeight,
   secureUrlToken,
-  args,
+  args = {},
 }: BuildImgixFluidArgs): FluidObject => {
   const aspectRatio = sourceWidth / sourceHeight
   const maxWidth = args.maxWidth ?? DEFAULT_FLUID_MAX_WIDTH
 
-  const base64 = buildImgixLqipUrl(url, secureUrlToken)(args.imgixParams)
+  const base64 = buildImgixLqipUrl(url, secureUrlToken)(args.imgixParams ?? {})
   const src = buildImgixUrl(
     url,
     secureUrlToken,
@@ -164,9 +178,12 @@ export const buildImgixFluid = ({
     w: maxWidth,
     h: args.maxHeight,
   })
-  const srcSet = buildImgixFluidSrcSet(url, secureUrlToken)(args.imgixParams)({
+  const srcSet = buildImgixFluidSrcSet(
+    url,
+    secureUrlToken,
+  )(args.imgixParams ?? {})({
     aspectRatio,
-    maxWidth: args.maxWidth,
+    maxWidth: maxWidth,
     srcSetBreakpoints: args.srcSetBreakpoints,
   })
 
