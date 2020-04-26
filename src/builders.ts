@@ -21,6 +21,9 @@ export const buildImgixUrl = (url: string, secureUrlToken?: string) => (
   params: ImgixUrlQueryParams,
 ) => {
   const imgixUrl = _buildImgixUrl(url)(params)
+
+  if (!secureUrlToken) return imgixUrl
+
   const parsed = new URL(imgixUrl)
 
   parsed.searchParams.delete('s')
