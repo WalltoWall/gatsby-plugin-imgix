@@ -1,21 +1,18 @@
-import { buildImgixUrl, ImgixFit, ImgixUrlQueryParams } from 'ts-imgix'
-import { buildFixedGatsbyImage } from '../src'
+import { buildImgixUrl, ImgixUrlQueryParams } from 'ts-imgix'
+import { buildImgixFixed } from '../src'
 
 import { splitSrcSet, normalizeUrl } from './__testutils__'
 
 const URL_SRC = 'https://example.imgix.net/image.jpg'
 const URL_WIDTH = 2000
 const URL_HEIGHT = 1000
-const DEFAULT_PARAMS = {
-  auto: { compress: true, format: true },
-  fit: ImgixFit.max,
-  q: 50,
-}
+
+// w=400 is the default width of buildImgixFixed
 const buildTestUrl = (params: ImgixUrlQueryParams = {}) =>
-  buildImgixUrl(URL_SRC)({ ...DEFAULT_PARAMS, w: 400, h: 200, ...params })
+  buildImgixUrl(URL_SRC)({ w: 400, h: 200, ...params })
 
 test('jpg without args', () => {
-  const result = buildFixedGatsbyImage({
+  const result = buildImgixFixed({
     url: URL_SRC,
     sourceWidth: URL_WIDTH,
     sourceHeight: URL_HEIGHT,
@@ -33,7 +30,7 @@ test('jpg without args', () => {
 
 test('jpg with existing params without args', () => {
   const rect = { x: 0, y: 0, w: 3600, h: 1800 }
-  const result = buildFixedGatsbyImage({
+  const result = buildImgixFixed({
     url: buildTestUrl({ rect }),
     sourceWidth: URL_WIDTH,
     sourceHeight: URL_HEIGHT,
@@ -52,7 +49,7 @@ test('jpg with existing params without args', () => {
 })
 
 test('jpg with width (600)', () => {
-  const result = buildFixedGatsbyImage({
+  const result = buildImgixFixed({
     url: URL_SRC,
     sourceWidth: URL_WIDTH,
     sourceHeight: URL_HEIGHT,
@@ -70,7 +67,7 @@ test('jpg with width (600)', () => {
 })
 
 test('jpg with height (400)', () => {
-  const result = buildFixedGatsbyImage({
+  const result = buildImgixFixed({
     url: URL_SRC,
     sourceWidth: URL_WIDTH,
     sourceHeight: URL_HEIGHT,
@@ -88,7 +85,7 @@ test('jpg with height (400)', () => {
 })
 
 test('jpg with width (600) and height (400)', () => {
-  const result = buildFixedGatsbyImage({
+  const result = buildImgixFixed({
     url: URL_SRC,
     sourceWidth: URL_WIDTH,
     sourceHeight: URL_HEIGHT,
