@@ -179,21 +179,19 @@ query {
 
 ## Programmatic use
 
-### Building `gatsby-image` fixed and fluid objects
-
 The following functions are provided to build a `gatsby-image`-compatible object
 for `fixed` and `fluid` responsive images. These functions are used internally
 by this plugin to build the `gatsby-image` objects.
 
-#### buildImgixFixed
+### buildImgixFixed
 
 _Docs coming soon_
 
-#### buildImgixFluid
+### buildImgixFluid
 
 _Docs coming soon_
 
-### For plugin developers
+## For plugin developers
 
 `gatsby-plugin-imgix` can be used to provide [`gatsby-image`][gatsby-image]
 support to your Imgix-backed plugin. Source plugins that serve Imgix URLs, such
@@ -207,7 +205,7 @@ The following plugins use `gatsby-plugin-imgix`:
 The following functions can be used to integrate `gatsby-plugin-imgix` with your
 plugin.
 
-#### createImgixUrlFieldConfig
+### createImgixUrlFieldConfig
 
 Creates a GraphQL field config object that resolves an Imgix URL string to one
 with URL parameters.
@@ -236,7 +234,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
 }
 ```
 
-#### createImgixFixedFieldConfig
+### createImgixFixedFieldConfig
 
 Creates a GraphQL field config object that resolves an Imgix URL string to a
 [`gatsby-image`][gatsby-image]-compatible `FixedObject`.
@@ -266,7 +264,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
 }
 ```
 
-#### createImgixFluidFieldConfig
+### createImgixFluidFieldConfig
 
 Creates a GraphQL field config object that resolves an Imgix URL string to a
 [`gatsby-image`][gatsby-image]-compatible `FluidObject`.
