@@ -1,4 +1,3 @@
-[gatsby-plugin-imgix](../README.md) › [Globals](../globals.md) › ["index"](../modules/_index_.md) › [ImgixUrlArgs](_index_.imgixurlargs.md)
 
 # Interface: ImgixUrlArgs
 
@@ -18,4 +17,4 @@
 
 • **imgixParams**? : *ImgixUrlParams*
 
-*Defined in [src/createImgixUrlFieldConfig.ts:13](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/cbe46b2/src/createImgixUrlFieldConfig.ts#L13)*
+*Defined in [src/createImgixUrlFieldConfig.ts:13](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/22b385b/src/createImgixUrlFieldConfig.ts#L13)*

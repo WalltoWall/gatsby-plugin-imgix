@@ -1,4 +1,3 @@
-[gatsby-plugin-imgix](README.md) › [Globals](globals.md)
 
 # gatsby-plugin-imgix
 
