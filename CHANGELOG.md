@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.1](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.4.0...v0.4.1) (2020-04-27)
+
+
+### Bug Fixes
+
+* parent field type name on Fixed fragments ([92c2277](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/92c2277ba6a3abfeec71158e536c1b5658728e9c))
+* sign URL only if token provided ([495339d](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/495339d0cab771d818c03f90bb2107d702e93a94))
+* support optional URL builder args ([ec4ebfa](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/ec4ebfa154974ac222d1535ff0db03d6dbaf6a23))
+
 ## [0.4.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.3.0...v0.4.0) (2020-04-20)
 
 
