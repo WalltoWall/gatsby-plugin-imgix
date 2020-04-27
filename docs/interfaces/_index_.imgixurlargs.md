@@ -16,6 +16,6 @@
 
 ### `Optional` imgixParams
 
-• **imgixParams**? : *[ImgixUrlParams](_types_.imgixurlparams.md)*
+• **imgixParams**? : *ImgixUrlParams*
 
-*Defined in [src/createImgixUrlFieldConfig.ts:13](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/createImgixUrlFieldConfig.ts#L13)*
+*Defined in [src/createImgixUrlFieldConfig.ts:13](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/cbe46b2/src/createImgixUrlFieldConfig.ts#L13)*

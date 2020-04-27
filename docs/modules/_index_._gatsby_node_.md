@@ -16,7 +16,7 @@
 
 ▸ **createSchemaCustomization**(`gatsbyContext`: CreateSchemaCustomizationArgs, `pluginOptions`: PluginOptions): *Promise‹void›*
 
-*Defined in [src/gatsby-node.ts:114](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/gatsby-node.ts#L114)*
+*Defined in [src/gatsby-node.ts:114](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/cbe46b2/src/gatsby-node.ts#L114)*
 
 **Parameters:**
 
@@ -33,7 +33,7 @@ ___
 
 ▸ **onCreateNode**(`gatsbyContext`: CreateNodeArgs‹TNode›, `pluginOptions`: PluginOptions): *Promise‹void›*
 
-*Defined in [src/gatsby-node.ts:49](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/gatsby-node.ts#L49)*
+*Defined in [src/gatsby-node.ts:49](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/cbe46b2/src/gatsby-node.ts#L49)*
 
 **Parameters:**
 
@@ -50,7 +50,7 @@ ___
 
 ▸ **onPreExtractQueries**(`gatsbyContext`: ParentSpanPluginArgs): *void*
 
-*Defined in [src/gatsby-node.ts:182](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/gatsby-node.ts#L182)*
+*Defined in [src/gatsby-node.ts:182](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/cbe46b2/src/gatsby-node.ts#L182)*
 
 **Parameters:**
 
