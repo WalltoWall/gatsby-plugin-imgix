@@ -8,14 +8,11 @@ import {
 } from 'gatsby'
 import { GraphQLObjectType, GraphQLList } from 'gatsby/graphql'
 
-import {
-  createImgixUrlFieldConfig,
-  ImgixUrlArgs,
-} from './createImgixUrlFieldConfig'
+import { createImgixUrlFieldConfig } from './createImgixUrlFieldConfig'
 import { createImgixFixedFieldConfig } from './createImgixFixedFieldConfig'
 import { createImgixFluidFieldConfig } from './createImgixFluidFieldConfig'
 import { invariant, transformUrlForWebProxy, ns } from './utils'
-import { ImgixUrlParams, ImgixFixedArgs, ImgixFluidArgs } from './types'
+import { ImgixUrlParams } from './types'
 
 enum ImgixSourceType {
   AmazonS3 = 's3',
@@ -139,27 +136,23 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
     reporter,
   )
 
-  const ImgixImageType = new GraphQLObjectType<
-    string,
-    unknown,
-    ImgixUrlArgs | ImgixFixedArgs | ImgixFluidArgs
-  >({
+  const ImgixImageType = new GraphQLObjectType({
     name: ns(namespace, 'ImgixImage'),
     fields: {
       url: createImgixUrlFieldConfig({
-        resolveUrl: (url) => url,
+        resolveUrl: (url: string) => url,
         defaultImgixParams,
         secureUrlToken,
       }),
       fixed: createImgixFixedFieldConfig({
-        resolveUrl: (url) => url,
+        resolveUrl: (url: string) => url,
         secureUrlToken,
         namespace,
         defaultImgixParams,
         cache,
       }),
       fluid: createImgixFluidFieldConfig({
-        resolveUrl: (url) => url,
+        resolveUrl: (url: string) => url,
         secureUrlToken: secureUrlToken,
         namespace,
         defaultImgixParams,
