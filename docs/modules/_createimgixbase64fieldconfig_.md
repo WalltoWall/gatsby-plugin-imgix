@@ -4,10 +4,6 @@
 
 ## Index
 
-### Interfaces
-
-* [CreateImgixBase64UrlFieldConfigArgs](../interfaces/_createimgixbase64fieldconfig_.createimgixbase64urlfieldconfigargs.md)
-
 ### Functions
 
 * [createImgixBase64UrlFieldConfig](_createimgixbase64fieldconfig_.md#const-createimgixbase64urlfieldconfig)
@@ -18,7 +14,7 @@
 
 ▸ **createImgixBase64UrlFieldConfig**<**TContext**>(`__namedParameters`: object): *GraphQLFieldConfig‹FixedObject | FluidObject, TContext›*
 
-*Defined in [src/createImgixBase64FieldConfig.ts:18](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/createImgixBase64FieldConfig.ts#L18)*
+*Defined in [src/createImgixBase64FieldConfig.ts:18](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/createImgixBase64FieldConfig.ts#L18)*
 
 **Type parameters:**
 

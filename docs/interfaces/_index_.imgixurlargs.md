@@ -1,4 +1,4 @@
-[gatsby-plugin-imgix](../README.md) › [Globals](../globals.md) › ["createImgixUrlFieldConfig"](../modules/_createimgixurlfieldconfig_.md) › [ImgixUrlArgs](_createimgixurlfieldconfig_.imgixurlargs.md)
+[gatsby-plugin-imgix](../README.md) › [Globals](../globals.md) › ["index"](../modules/_index_.md) › [ImgixUrlArgs](_index_.imgixurlargs.md)
 
 # Interface: ImgixUrlArgs
 
@@ -10,7 +10,7 @@
 
 ### Properties
 
-* [imgixParams](_createimgixurlfieldconfig_.imgixurlargs.md#optional-imgixparams)
+* [imgixParams](_index_.imgixurlargs.md#optional-imgixparams)
 
 ## Properties
 

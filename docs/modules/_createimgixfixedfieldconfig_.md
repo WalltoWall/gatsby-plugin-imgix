@@ -4,33 +4,9 @@
 
 ## Index
 
-### Interfaces
-
-* [CreateImgixFixedFieldConfigArgs](../interfaces/_createimgixfixedfieldconfig_.createimgixfixedfieldconfigargs.md)
-
-### Variables
-
-* [imgixFixedArgs](_createimgixfixedfieldconfig_.md#const-imgixfixedargs)
-
 ### Functions
 
 * [createImgixFixedFieldConfig](_createimgixfixedfieldconfig_.md#const-createimgixfixedfieldconfig)
-
-## Variables
-
-### `Const` imgixFixedArgs
-
-• **imgixFixedArgs**: *object* = {
-  width: { type: GraphQLInt, defaultValue: DEFAULT_FIXED_WIDTH },
-  height: { type: GraphQLInt },
-  imgixParams: { type: ImgixUrlParamsInputType, defaultValue: {} },
-} as GraphQLFieldConfigArgumentMap
-
-*Defined in [src/createImgixFixedFieldConfig.ts:22](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/createImgixFixedFieldConfig.ts#L22)*
-
-#### Type declaration:
-
-* \[ **key**: *string*\]: GraphQLArgumentConfig
 
 ## Functions
 
@@ -38,7 +14,7 @@
 
 ▸ **createImgixFixedFieldConfig**<**TSource**, **TContext**>(`__namedParameters`: object): *GraphQLFieldConfig‹TSource, TContext, [ImgixFixedArgs](../interfaces/_types_.imgixfixedargs.md)›*
 
-*Defined in [src/createImgixFixedFieldConfig.ts:36](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/createImgixFixedFieldConfig.ts#L36)*
+*Defined in [src/createImgixFixedFieldConfig.ts:36](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/createImgixFixedFieldConfig.ts#L36)*
 
 **Type parameters:**
 

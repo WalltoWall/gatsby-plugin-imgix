@@ -6,30 +6,11 @@
 
 ### Interfaces
 
-* [CreateImgixUrlFieldConfigArgs](../interfaces/_createimgixurlfieldconfig_.createimgixurlfieldconfigargs.md)
 * [ImgixUrlArgs](../interfaces/_createimgixurlfieldconfig_.imgixurlargs.md)
-
-### Variables
-
-* [imgixUrlArgs](_createimgixurlfieldconfig_.md#const-imgixurlargs)
 
 ### Functions
 
 * [createImgixUrlFieldConfig](_createimgixurlfieldconfig_.md#const-createimgixurlfieldconfig)
-
-## Variables
-
-### `Const` imgixUrlArgs
-
-• **imgixUrlArgs**: *object* = {
-  imgixParams: { type: ImgixUrlParamsInputType, defaultValue: {} },
-} as GraphQLFieldConfigArgumentMap
-
-*Defined in [src/createImgixUrlFieldConfig.ts:16](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/createImgixUrlFieldConfig.ts#L16)*
-
-#### Type declaration:
-
-* \[ **key**: *string*\]: GraphQLArgumentConfig
 
 ## Functions
 
@@ -37,7 +18,7 @@
 
 ▸ **createImgixUrlFieldConfig**<**TSource**, **TContext**>(`__namedParameters`: object): *GraphQLFieldConfig‹TSource, TContext, [ImgixUrlArgs](../interfaces/_createimgixurlfieldconfig_.imgixurlargs.md)›*
 
-*Defined in [src/createImgixUrlFieldConfig.ts:31](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/createImgixUrlFieldConfig.ts#L31)*
+*Defined in [src/createImgixUrlFieldConfig.ts:31](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/createImgixUrlFieldConfig.ts#L31)*
 
 Creates a GraphQL field config object that resolves an Imgix URL string to one with URL parameters.
 

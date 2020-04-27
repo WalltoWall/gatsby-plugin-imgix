@@ -21,7 +21,7 @@
 
 • **imgixParams**? : *[ImgixUrlParams](_types_.imgixurlparams.md)*
 
-*Defined in [src/types.ts:16](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/types.ts#L16)*
+*Defined in [src/types.ts:16](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/types.ts#L16)*
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 • **maxHeight**? : *undefined | number*
 
-*Defined in [src/types.ts:14](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/types.ts#L14)*
+*Defined in [src/types.ts:14](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/types.ts#L14)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **maxWidth**? : *undefined | number*
 
-*Defined in [src/types.ts:13](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/types.ts#L13)*
+*Defined in [src/types.ts:13](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/types.ts#L13)*
 
 ___
 
@@ -45,4 +45,4 @@ ___
 
 • **srcSetBreakpoints**? : *number[]*
 
-*Defined in [src/types.ts:15](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/types.ts#L15)*
+*Defined in [src/types.ts:15](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/types.ts#L15)*

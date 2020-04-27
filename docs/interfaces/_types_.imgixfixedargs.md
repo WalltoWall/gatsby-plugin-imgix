@@ -20,7 +20,7 @@
 
 • **height**? : *undefined | number*
 
-*Defined in [src/types.ts:8](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/types.ts#L8)*
+*Defined in [src/types.ts:8](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/types.ts#L8)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **imgixParams**? : *[ImgixUrlParams](_types_.imgixurlparams.md)*
 
-*Defined in [src/types.ts:9](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/types.ts#L9)*
+*Defined in [src/types.ts:9](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/types.ts#L9)*
 
 ___
 
@@ -36,4 +36,4 @@ ___
 
 • **width**? : *undefined | number*
 
-*Defined in [src/types.ts:7](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/types.ts#L7)*
+*Defined in [src/types.ts:7](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/types.ts#L7)*

@@ -19,7 +19,7 @@
 
 • **h**? : *undefined | number*
 
-*Defined in [src/types.ts:3](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/types.ts#L3)*
+*Defined in [src/types.ts:3](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/types.ts#L3)*
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **w**? : *undefined | number*
 
-*Defined in [src/types.ts:2](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/types.ts#L2)*
+*Defined in [src/types.ts:2](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/types.ts#L2)*

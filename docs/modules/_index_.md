@@ -4,61 +4,174 @@
 
 ## Index
 
-### References
+### Modules
 
-* [ImgixUrlArgs](_index_.md#imgixurlargs)
-* [_gatsbyNode](_index_.md#_gatsbynode)
-* [buildImgixFixed](_index_.md#buildimgixfixed)
-* [buildImgixFluid](_index_.md#buildimgixfluid)
-* [createImgixFixedFieldConfig](_index_.md#createimgixfixedfieldconfig)
-* [createImgixFluidFieldConfig](_index_.md#createimgixfluidfieldconfig)
-* [createImgixUrlFieldConfig](_index_.md#createimgixurlfieldconfig)
-* [transformUrlForWebProxy](_index_.md#transformurlforwebproxy)
+* ["gatsby-node"](_index_._gatsby_node_.md)
 
-## References
+### Interfaces
 
-###  ImgixUrlArgs
+* [ImgixUrlArgs](../interfaces/_index_.imgixurlargs.md)
 
-• **ImgixUrlArgs**:
+### Functions
 
-___
+* [buildImgixFixed](_index_.md#const-buildimgixfixed)
+* [buildImgixFluid](_index_.md#const-buildimgixfluid)
+* [createImgixFixedFieldConfig](_index_.md#const-createimgixfixedfieldconfig)
+* [createImgixFluidFieldConfig](_index_.md#const-createimgixfluidfieldconfig)
+* [createImgixUrlFieldConfig](_index_.md#const-createimgixurlfieldconfig)
+* [transformUrlForWebProxy](_index_.md#const-transformurlforwebproxy)
 
-###  _gatsbyNode
+## Functions
 
-• **_gatsbyNode**:
+### `Const` buildImgixFixed
 
-___
+▸ **buildImgixFixed**(`__namedParameters`: object): *FixedObject*
 
-###  buildImgixFixed
+*Defined in [src/builders.ts:66](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/builders.ts#L66)*
 
-• **buildImgixFixed**:
+Builds a gatsby-image-compatible fixed image object from a base Imgix image URL.
 
-___
+**Parameters:**
 
-###  buildImgixFluid
+▪ **__namedParameters**: *object*
 
-• **buildImgixFluid**:
+Name | Type |
+------ | ------ |
+`args` | [ImgixFixedArgs](../interfaces/_types_.imgixfixedargs.md) |
+`secureUrlToken` | undefined &#124; string |
+`sourceHeight` | number |
+`sourceWidth` | number |
+`url` | string |
 
-___
+**Returns:** *FixedObject*
 
-###  createImgixFixedFieldConfig
-
-• **createImgixFixedFieldConfig**:
-
-___
-
-###  createImgixFluidFieldConfig
-
-• **createImgixFluidFieldConfig**:
+gatsby-image-compatible fixed image object.
 
 ___
 
-###  createImgixUrlFieldConfig
+### `Const` buildImgixFluid
 
-• **createImgixUrlFieldConfig**:
+▸ **buildImgixFluid**(`__namedParameters`: object): *FluidObject*
+
+*Defined in [src/builders.ts:160](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/builders.ts#L160)*
+
+Builds a gatsby-image-compatible fluid image object from a base Imgix image URL.
+
+**Parameters:**
+
+▪ **__namedParameters**: *object*
+
+Name | Type |
+------ | ------ |
+`args` | [ImgixFluidArgs](../interfaces/_types_.imgixfluidargs.md) |
+`secureUrlToken` | undefined &#124; string |
+`sourceHeight` | number |
+`sourceWidth` | number |
+`url` | string |
+
+**Returns:** *FluidObject*
+
+gatsby-image-compatible fluid image object.
 
 ___
 
-###  transformUrlForWebProxy
+### `Const` createImgixFixedFieldConfig
 
-• **transformUrlForWebProxy**:
+▸ **createImgixFixedFieldConfig**<**TSource**, **TContext**>(`__namedParameters`: object): *GraphQLFieldConfig‹TSource, TContext, [ImgixFixedArgs](../interfaces/_types_.imgixfixedargs.md)›*
+
+*Defined in [src/createImgixFixedFieldConfig.ts:36](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/createImgixFixedFieldConfig.ts#L36)*
+
+**Type parameters:**
+
+▪ **TSource**
+
+▪ **TContext**
+
+**Parameters:**
+
+▪ **__namedParameters**: *object*
+
+Name | Type |
+------ | ------ |
+`cache` | object |
+`defaultImgixParams` | undefined &#124; [ImgixUrlParams](../interfaces/_types_.imgixurlparams.md) |
+`namespace` | undefined &#124; string |
+`resolveUrl` | function |
+`secureUrlToken` | undefined &#124; string |
+
+**Returns:** *GraphQLFieldConfig‹TSource, TContext, [ImgixFixedArgs](../interfaces/_types_.imgixfixedargs.md)›*
+
+___
+
+### `Const` createImgixFluidFieldConfig
+
+▸ **createImgixFluidFieldConfig**<**TSource**, **TContext**>(`__namedParameters`: object): *GraphQLFieldConfig‹TSource, TContext, [ImgixFluidArgs](../interfaces/_types_.imgixfluidargs.md)›*
+
+*Defined in [src/createImgixFluidFieldConfig.ts:39](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/createImgixFluidFieldConfig.ts#L39)*
+
+**Type parameters:**
+
+▪ **TSource**
+
+▪ **TContext**
+
+**Parameters:**
+
+▪ **__namedParameters**: *object*
+
+Name | Type |
+------ | ------ |
+`cache` | object |
+`defaultImgixParams` | undefined &#124; [ImgixUrlParams](../interfaces/_types_.imgixurlparams.md) |
+`namespace` | undefined &#124; string |
+`resolveUrl` | function |
+`secureUrlToken` | undefined &#124; string |
+
+**Returns:** *GraphQLFieldConfig‹TSource, TContext, [ImgixFluidArgs](../interfaces/_types_.imgixfluidargs.md)›*
+
+___
+
+### `Const` createImgixUrlFieldConfig
+
+▸ **createImgixUrlFieldConfig**<**TSource**, **TContext**>(`__namedParameters`: object): *GraphQLFieldConfig‹TSource, TContext, [ImgixUrlArgs](../interfaces/_createimgixurlfieldconfig_.imgixurlargs.md)›*
+
+*Defined in [src/createImgixUrlFieldConfig.ts:31](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/createImgixUrlFieldConfig.ts#L31)*
+
+Creates a GraphQL field config object that resolves an Imgix URL string to one with URL parameters.
+
+**Type parameters:**
+
+▪ **TSource**
+
+▪ **TContext**
+
+**Parameters:**
+
+▪ **__namedParameters**: *object*
+
+Name | Type |
+------ | ------ |
+`defaultImgixParams` | undefined &#124; [ImgixUrlParams](../interfaces/_types_.imgixurlparams.md) |
+`resolveUrl` | function |
+`secureUrlToken` | undefined &#124; string |
+
+**Returns:** *GraphQLFieldConfig‹TSource, TContext, [ImgixUrlArgs](../interfaces/_createimgixurlfieldconfig_.imgixurlargs.md)›*
+
+GraphQL field config to pass to a GraphQL constructor or a Gatsby schema builder.
+
+___
+
+### `Const` transformUrlForWebProxy
+
+▸ **transformUrlForWebProxy**(`url`: string, `domain`: string): *string*
+
+*Defined in [src/utils.ts:15](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/utils.ts#L15)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`url` | string |
+`domain` | string |
+
+**Returns:** *string*

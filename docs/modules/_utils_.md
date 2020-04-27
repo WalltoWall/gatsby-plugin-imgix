@@ -22,7 +22,7 @@
 
 Ƭ **Maybe**: *T | undefined*
 
-*Defined in [src/utils.ts:3](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/utils.ts#L3)*
+*Defined in [src/utils.ts:3](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/utils.ts#L3)*
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 Ƭ **Nullable**: *[Maybe](_utils_.md#maybe)‹T | null›*
 
-*Defined in [src/utils.ts:4](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/utils.ts#L4)*
+*Defined in [src/utils.ts:4](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/utils.ts#L4)*
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 Ƭ **OptionalPromise**: *T | Promise‹T›*
 
-*Defined in [src/utils.ts:5](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/utils.ts#L5)*
+*Defined in [src/utils.ts:5](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/utils.ts#L5)*
 
 ## Functions
 
@@ -46,7 +46,7 @@ ___
 
 ▸ **invariant**(`condition`: unknown, `msg`: string, `reporter`: Reporter): *asserts condition*
 
-*Defined in [src/utils.ts:7](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/utils.ts#L7)*
+*Defined in [src/utils.ts:7](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/utils.ts#L7)*
 
 **Parameters:**
 
@@ -64,7 +64,7 @@ ___
 
 ▸ **ns**(`namespace`: string, `str`: string): *string*
 
-*Defined in [src/utils.ts:24](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/utils.ts#L24)*
+*Defined in [src/utils.ts:24](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/utils.ts#L24)*
 
 **Parameters:**
 
@@ -81,7 +81,7 @@ ___
 
 ▸ **transformUrlForWebProxy**(`url`: string, `domain`: string): *string*
 
-*Defined in [src/utils.ts:15](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/c3f9759/src/utils.ts#L15)*
+*Defined in [src/utils.ts:15](https://github.com/WalltoWall/gatsby-plugin-imgix/blob/e91e6e9/src/utils.ts#L15)*
 
 **Parameters:**
 
