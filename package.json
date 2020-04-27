@@ -1,6 +1,7 @@
 {
   "name": "gatsby-plugin-imgix",
   "version": "0.4.1",
+  "description": "Gatsby plugin which enables the use of Imgix to apply image transformations at request-time",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/gatsby-plugin-imgix.esm.js",
@@ -23,6 +24,17 @@
     "release": "standard-version"
   },
   "author": "Angelo Ashmore",
+  "homepage": "https://github.com/WalltoWall/gatsby-plugin-imgix",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WalltoWall/gatsby-plugin-imgix.git"
+  },
+  "keywords": [
+    "gatsby",
+    "gatsby-plugin",
+    "imgix",
+    "images"
+  ],
   "dependencies": {
     "node-fetch": "^2.6.0",
     "ts-imgix": "^0.0.11"
