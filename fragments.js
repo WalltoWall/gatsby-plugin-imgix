@@ -1,7 +1,7 @@
 import { graphql } from 'gatsby'
 
 export const GatsbyImgixFixedType = graphql`
-  fragment GatsbyImgixFixed on ImgixFluid {
+  fragment GatsbyImgixFixed on ImgixFixed {
     base64
     width
     height
@@ -12,8 +12,9 @@ export const GatsbyImgixFixedType = graphql`
   }
 `
 
+// eslint-disable-next-line @typescript-eslint/camelcase
 export const GatsbyImgixFixed_noBase64 = graphql`
-  fragment GatsbyImgixFixed_noBase64 on ImgixFluid {
+  fragment GatsbyImgixFixed_noBase64 on ImgixFixed {
     width
     height
     src
@@ -25,8 +26,9 @@ export const GatsbyImgixFixed_noBase64 = graphql`
 
 // Not actually necessary - since Imgix is scaling,
 // there is no "penalty" for including WebP by default
+// eslint-disable-next-line @typescript-eslint/camelcase
 export const GatsbyImgixFixed_withWebp = graphql`
-  fragment GatsbyImgixFixed_withWebp on ImgixFluid {
+  fragment GatsbyImgixFixed_withWebp on ImgixFixed {
     base64
     width
     height
@@ -39,8 +41,9 @@ export const GatsbyImgixFixed_withWebp = graphql`
 
 // Not actually necessary - since Imgix is scaling,
 // there is no "penalty" for including WebP by default
+// eslint-disable-next-line @typescript-eslint/camelcase
 export const GatsbyImgixFixed_withWebp_noBase64 = graphql`
-  fragment GatsbyImgixFixed_withWebp_noBase64 on ImgixFluid {
+  fragment GatsbyImgixFixed_withWebp_noBase64 on ImgixFixed {
     width
     height
     src
@@ -62,6 +65,7 @@ export const GatsbyImgixFluidType = graphql`
   }
 `
 
+// eslint-disable-next-line @typescript-eslint/camelcase
 export const GatsbyImgixFluid_noBase64 = graphql`
   fragment GatsbyImgixFluid_noBase64 on ImgixFluid {
     aspectRatio
@@ -75,6 +79,7 @@ export const GatsbyImgixFluid_noBase64 = graphql`
 
 // Not actually necessary - since Imgix is scaling,
 // there is no "penalty" for including WebP by default
+// eslint-disable-next-line @typescript-eslint/camelcase
 export const GatsbyImgixFluid_withWebp = graphql`
   fragment GatsbyImgixFluid_withWebp on ImgixFluid {
     base64
@@ -89,6 +94,7 @@ export const GatsbyImgixFluid_withWebp = graphql`
 
 // Not actually necessary - since Imgix is scaling,
 // there is no "penalty" for including WebP by default
+// eslint-disable-next-line @typescript-eslint/camelcase
 export const GatsbyImgixFluid_withWebp_noBase64 = graphql`
   fragment GatsbyImgixFluid_withWebp_noBase64 on ImgixFluid {
     aspectRatio
