@@ -23,6 +23,11 @@ interface CreateImgixUrlFieldConfigArgs<TSource> {
   defaultImgixParams?: ImgixUrlParams
 }
 
+/**
+ * Creates a GraphQL field config object that resolves an Imgix URL string to one with URL parameters.
+ *
+ * @returns GraphQL field config to pass to a GraphQL constructor or a Gatsby schema builder.
+ */
 export const createImgixUrlFieldConfig = <TSource, TContext>({
   resolveUrl,
   secureUrlToken,
