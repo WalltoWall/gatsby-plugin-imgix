@@ -9,6 +9,7 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from 'gatsby/graphql'
+import { FluidObject } from 'gatsby-image'
 
 import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
 import { buildImgixFluid, DEFAULT_FLUID_MAX_WIDTH } from './builders'
@@ -17,7 +18,7 @@ import {
   ImgixUrlParamsInputType,
   fetchImgixMetadata,
 } from './shared'
-import { ns } from './utils'
+import { ns, Maybe } from './utils'
 import { ImgixFluidArgs, ImgixUrlParams } from './types'
 
 const imgixFluidArgs = {
@@ -62,7 +63,7 @@ export const createImgixFluidFieldConfig = <TSource, TContext>({
   return {
     type: ImgixFluidType,
     args: imgixFluidArgs,
-    resolve: async (obj, args) => {
+    resolve: async (obj, args): Promise<Maybe<FluidObject>> => {
       const url = await resolveUrl(obj)
       if (!url) return
 

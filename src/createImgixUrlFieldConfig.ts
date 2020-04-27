@@ -5,14 +5,12 @@ import {
 } from 'gatsby/graphql'
 
 import { buildImgixUrl } from './builders'
-import {
-  ImgixResolveUrl,
-  ImgixUrlParams,
-  ImgixUrlParamsInputType,
-} from './shared'
+import { ImgixResolveUrl, ImgixUrlParamsInputType } from './shared'
+import { ImgixUrlParams } from './types'
+import { Maybe } from './utils'
 
 export interface ImgixUrlArgs {
-  imgixParams: ImgixUrlParams
+  imgixParams?: ImgixUrlParams
 }
 
 const imgixUrlArgs = {
@@ -36,7 +34,7 @@ export const createImgixUrlFieldConfig = <TSource, TContext>({
 > => ({
   type: GraphQLString,
   args: imgixUrlArgs,
-  resolve: async (obj, args) => {
+  resolve: async (obj, args): Promise<Maybe<string>> => {
     const url = await resolveUrl(obj)
     if (!url) return
 

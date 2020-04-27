@@ -7,6 +7,7 @@ import {
 import { FixedObject, FluidObject } from 'gatsby-image'
 
 import { fetchImgixBase64Url, ImgixResolveUrl } from './shared'
+import { Maybe } from './utils'
 
 interface CreateImgixBase64UrlFieldConfigArgs {
   resolveUrl?: ImgixResolveUrl<FixedObject | FluidObject>
@@ -15,7 +16,7 @@ interface CreateImgixBase64UrlFieldConfigArgs {
 }
 
 export const createImgixBase64UrlFieldConfig = <TContext>({
-  resolveUrl = obj => obj.base64,
+  resolveUrl = (obj): Maybe<string> => obj.base64,
   secureUrlToken,
   cache,
 }: CreateImgixBase64UrlFieldConfigArgs): GraphQLFieldConfig<
@@ -23,7 +24,7 @@ export const createImgixBase64UrlFieldConfig = <TContext>({
   TContext
 > => ({
   type: new GraphQLNonNull(GraphQLString),
-  resolve: async obj => {
+  resolve: async (obj): Promise<Maybe<string>> => {
     const url = await resolveUrl(obj)
     if (!url) return
 

@@ -8,11 +8,14 @@ import {
 } from 'gatsby'
 import { GraphQLObjectType, GraphQLList } from 'gatsby/graphql'
 
-import { createImgixUrlFieldConfig } from './createImgixUrlFieldConfig'
+import {
+  createImgixUrlFieldConfig,
+  ImgixUrlArgs,
+} from './createImgixUrlFieldConfig'
 import { createImgixFixedFieldConfig } from './createImgixFixedFieldConfig'
 import { createImgixFluidFieldConfig } from './createImgixFluidFieldConfig'
 import { invariant, transformUrlForWebProxy, ns } from './utils'
-import { ImgixUrlParams } from './shared'
+import { ImgixUrlParams, ImgixFixedArgs, ImgixFluidArgs } from './types'
 
 enum ImgixSourceType {
   AmazonS3 = 's3',
@@ -61,7 +64,7 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = async (
   )
 
   const fieldOptions = fields.filter(
-    fieldOptions => fieldOptions.nodeType === node.internal.type,
+    (fieldOptions) => fieldOptions.nodeType === node.internal.type,
   )
   if (fieldOptions.length < 1) return
 
@@ -101,8 +104,8 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = async (
       )
 
       if (Array.isArray(fieldValue))
-        fieldValue = fieldValue.map(url =>
-          transformUrlForWebProxy(url, pluginOptions.domain!),
+        fieldValue = fieldValue.map((url) =>
+          transformUrlForWebProxy(url, domain),
         )
       else fieldValue = transformUrlForWebProxy(fieldValue, domain)
     }
@@ -136,23 +139,27 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
     reporter,
   )
 
-  const ImgixImageType = new GraphQLObjectType<string, unknown, any>({
+  const ImgixImageType = new GraphQLObjectType<
+    string,
+    unknown,
+    ImgixUrlArgs | ImgixFixedArgs | ImgixFluidArgs
+  >({
     name: ns(namespace, 'ImgixImage'),
     fields: {
       url: createImgixUrlFieldConfig({
-        resolveUrl: url => url,
+        resolveUrl: (url) => url,
         defaultImgixParams,
         secureUrlToken,
       }),
       fixed: createImgixFixedFieldConfig({
-        resolveUrl: url => url,
+        resolveUrl: (url) => url,
         secureUrlToken,
         namespace,
         defaultImgixParams,
         cache,
       }),
       fluid: createImgixFluidFieldConfig({
-        resolveUrl: url => url,
+        resolveUrl: (url) => url,
         secureUrlToken: secureUrlToken,
         namespace,
         defaultImgixParams,
@@ -161,7 +168,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
     },
   })
 
-  const fieldTypes = fields.map(fieldOptions =>
+  const fieldTypes = fields.map((fieldOptions) =>
     schema.buildObjectType({
       name: `${fieldOptions.nodeType}Fields`,
       fields: {
@@ -179,7 +186,9 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
   createTypes(fieldTypes)
 }
 
-export const onPreExtractQueries: GatsbyNode['onPreExtractQueries'] = gatsbyContext => {
+export const onPreExtractQueries: GatsbyNode['onPreExtractQueries'] = (
+  gatsbyContext,
+) => {
   const { store } = gatsbyContext
   const { program } = store.getState()
 

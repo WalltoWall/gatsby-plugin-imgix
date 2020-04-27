@@ -7,6 +7,7 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from 'gatsby/graphql'
+import { FixedObject } from 'gatsby-image'
 
 import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
 import { buildImgixFixed, DEFAULT_FIXED_WIDTH } from './builders'
@@ -15,7 +16,7 @@ import {
   ImgixUrlParamsInputType,
   fetchImgixMetadata,
 } from './shared'
-import { ns } from './utils'
+import { ns, Maybe } from './utils'
 import { ImgixFixedArgs, ImgixUrlParams } from './types'
 
 const imgixFixedArgs = {
@@ -60,7 +61,7 @@ export const createImgixFixedFieldConfig = <TSource, TContext>({
   return {
     type: ImgixFixedType,
     args: imgixFixedArgs,
-    resolve: async (obj, args) => {
+    resolve: async (obj, args): Promise<Maybe<FixedObject>> => {
       const url = await resolveUrl(obj)
       if (!url) return
 

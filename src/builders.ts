@@ -18,7 +18,7 @@ const DEFAULT_LQIP_PARAMS: ImgixUrlQueryParams = { w: 100, blur: 15, q: 20 }
 
 export const buildImgixUrl = (url: string, secureUrlToken?: string) => (
   params: ImgixUrlQueryParams,
-) => {
+): string => {
   const imgixUrl = _buildImgixUrl(url)(params)
 
   if (!secureUrlToken) return imgixUrl
@@ -28,22 +28,20 @@ export const buildImgixUrl = (url: string, secureUrlToken?: string) => (
   parsed.searchParams.delete('s')
 
   const signatureBase = secureUrlToken + parsed.pathname + parsed.search
-  const signature = createHash('md5')
-    .update(signatureBase)
-    .digest('hex')
+  const signature = createHash('md5').update(signatureBase).digest('hex')
 
   parsed.searchParams.append('s', signature)
 
   return parsed.href
 }
 
-const buildImgixLqipUrl: typeof buildImgixUrl = (...args) => params =>
+const buildImgixLqipUrl: typeof buildImgixUrl = (...args) => (params): string =>
   buildImgixUrl(...args)({ ...params, ...DEFAULT_LQIP_PARAMS })
 
 const buildImgixFixedSrcSet = (baseUrl: string, secureUrlToken?: string) => (
   params: ImgixUrlQueryParams,
-) =>
-  FIXED_RESOLUTIONS.map(resolution => {
+): string =>
+  FIXED_RESOLUTIONS.map((resolution) => {
     const url = buildImgixUrl(
       baseUrl,
       secureUrlToken,
@@ -123,15 +121,15 @@ const buildImgixFluidSrcSet = (baseUrl: string, secureUrlToken?: string) => (
 ) => ({
   aspectRatio,
   maxWidth,
-  srcSetBreakpoints = FLUID_BREAKPOINT_FACTORS.map(x => maxWidth * x),
-}: BuildFluidSrcSetArgs) => {
+  srcSetBreakpoints = FLUID_BREAKPOINT_FACTORS.map((x) => maxWidth * x),
+}: BuildFluidSrcSetArgs): string => {
   // Remove duplicates, sort by numerical value, and ensure maxWidth is added.
   const uniqSortedBreakpoints = Array.from(
     new Set([...srcSetBreakpoints, maxWidth]),
   ).sort((a, b) => a - b)
 
   return uniqSortedBreakpoints
-    .map(breakpoint => {
+    .map((breakpoint) => {
       const url = buildImgixUrl(
         baseUrl,
         secureUrlToken,
