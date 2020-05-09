@@ -6,7 +6,8 @@ import {
 } from 'gatsby/graphql'
 import { FixedObject, FluidObject } from 'gatsby-image'
 
-import { fetchImgixBase64Url, ImgixResolveUrl } from './shared'
+import { fetchImgixBase64Url } from './shared'
+import { ImgixResolveUrl } from './types'
 import { Maybe } from './utils'
 
 interface CreateImgixBase64UrlFieldConfigArgs {

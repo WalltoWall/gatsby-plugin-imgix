@@ -264,10 +264,34 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
 }
 ```
 
+---
+
 ### createImgixFluidFieldConfig
 
 Creates a GraphQL field config object that resolves an Imgix URL string to a
 [`gatsby-image`][gatsby-image]-compatible `FluidObject`.
+
+```typescript
+import { createImgixFluidFieldConfig } from 'gatsby-plugin-imgix'
+
+createImgixFluidFieldConfig(args: CreateImgixFluidFieldConfig): GraphQLFieldConfig
+```
+
+#### Arguments
+
+- **`resolveUrl`** (Function)<br/> Maps the parent object to an Imgix URL.
+
+- **`secureUrlToken`** (undefined | String)<br/> Imgix secure URL token used to
+  sign URLs. If a token is provided, all URLs will be signed. This is
+  recommended.
+
+- **`defaultImgixParams = {}`**: (undefined | Object)<br/> Default Imgix URL
+  parameters to apply to all images.
+
+| Name             | Type                  | Description                                                                                                     |
+| ---------------- | --------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `resolveUrl`     | undefined \| Function | Maps the parent object to an Imgix URL.                                                                         |
+| `secureUrlToken` | undefined \| string   | Imgix secure URL token used to sign URLs. If a token is provided, all URLs will be signed. This is recommended. |
 
 ```typescript
 import { GatsbyNode } from 'gatsby'

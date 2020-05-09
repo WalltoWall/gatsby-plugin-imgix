@@ -7,7 +7,6 @@ import {
 import fetch from 'node-fetch'
 
 import { buildImgixUrl } from './builders'
-import { Nullable, OptionalPromise } from './utils'
 
 export const imgixUrlParams = {
   w: { type: GraphQLInt },
@@ -18,10 +17,6 @@ export const ImgixUrlParamsInputType = new GraphQLInputObjectType({
   name: 'ImgixParamsInputType',
   fields: imgixUrlParams,
 })
-
-export type ImgixResolveUrl<TSource> = (
-  obj: TSource,
-) => OptionalPromise<Nullable<string>>
 
 interface ImgixMetadata {
   'Content-Type': string

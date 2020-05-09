@@ -13,13 +13,9 @@ import { FluidObject } from 'gatsby-image'
 
 import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
 import { buildImgixFluid, DEFAULT_FLUID_MAX_WIDTH } from './builders'
-import {
-  ImgixResolveUrl,
-  ImgixUrlParamsInputType,
-  fetchImgixMetadata,
-} from './shared'
+import { ImgixUrlParamsInputType, fetchImgixMetadata } from './shared'
 import { ns, Maybe } from './utils'
-import { ImgixFluidArgs, ImgixUrlParams } from './types'
+import { ImgixFluidArgs, ImgixUrlParams, ImgixResolveUrl } from './types'
 
 const imgixFluidArgs = {
   maxWidth: { type: GraphQLInt, defaultValue: DEFAULT_FLUID_MAX_WIDTH },

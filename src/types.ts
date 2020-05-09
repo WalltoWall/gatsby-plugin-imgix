@@ -1,3 +1,9 @@
+import { Nullable, OptionalPromise } from './utils'
+
+export type ImgixResolveUrl<TSource> = (
+  obj: TSource,
+) => OptionalPromise<Nullable<string>>
+
 export interface ImgixUrlParams {
   w?: number
   h?: number

@@ -11,13 +11,9 @@ import { FixedObject } from 'gatsby-image'
 
 import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
 import { buildImgixFixed, DEFAULT_FIXED_WIDTH } from './builders'
-import {
-  ImgixResolveUrl,
-  ImgixUrlParamsInputType,
-  fetchImgixMetadata,
-} from './shared'
+import { ImgixUrlParamsInputType, fetchImgixMetadata } from './shared'
 import { ns, Maybe } from './utils'
-import { ImgixFixedArgs, ImgixUrlParams } from './types'
+import { ImgixFixedArgs, ImgixUrlParams, ImgixResolveUrl } from './types'
 
 const imgixFixedArgs = {
   width: { type: GraphQLInt, defaultValue: DEFAULT_FIXED_WIDTH },

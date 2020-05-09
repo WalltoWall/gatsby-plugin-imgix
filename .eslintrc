@@ -1,6 +1,6 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "eslint-plugin-tsdoc"],
   "extends": ["plugin:@typescript-eslint/recommended"],
   "rules": {
     "@typescript-eslint/member-delimiter-style": [
@@ -10,6 +10,7 @@
           "delimiter": "none"
         }
       }
-    ]
+    ],
+    "tsdoc/syntax": "warn"
   }
 }
