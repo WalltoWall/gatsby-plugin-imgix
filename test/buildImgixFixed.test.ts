@@ -1,5 +1,4 @@
-import { buildImgixUrl, ImgixUrlQueryParams } from 'ts-imgix'
-import { buildImgixFixed } from '../src'
+import { buildImgixUrl, buildImgixFixed, ImgixUrlParams } from '../src'
 
 import { splitSrcSet, normalizeUrl } from './__testutils__'
 
@@ -8,7 +7,7 @@ const URL_WIDTH = 2000
 const URL_HEIGHT = 1000
 
 // w=400 is the default width of buildImgixFixed
-const buildTestUrl = (params: ImgixUrlQueryParams = {}) =>
+const buildTestUrl = (params: ImgixUrlParams = {}): string =>
   buildImgixUrl(URL_SRC)({ w: 400, h: 200, ...params })
 
 test('jpg without args', () => {
@@ -29,7 +28,7 @@ test('jpg without args', () => {
 })
 
 test('jpg with existing params without args', () => {
-  const rect = { x: 0, y: 0, w: 3600, h: 1800 }
+  const rect = '0,0,3600,1800'
   const result = buildImgixFixed({
     url: buildTestUrl({ rect }),
     sourceWidth: URL_WIDTH,

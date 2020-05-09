@@ -1,5 +1,4 @@
-import { buildImgixUrl, ImgixUrlQueryParams } from 'ts-imgix'
-import { buildImgixFluid } from '../src'
+import { buildImgixUrl, buildImgixFluid, ImgixUrlParams } from '../src'
 
 import { splitSrcSet, normalizeUrl } from './__testutils__'
 
@@ -8,7 +7,7 @@ const URL_WIDTH = 2000
 const URL_HEIGHT = 1000
 
 // w=800 is the default maxWidth of buildImgixFluid
-const buildTestUrl = (params: ImgixUrlQueryParams = {}) =>
+const buildTestUrl = (params: ImgixUrlParams = {}): string =>
   buildImgixUrl(URL_SRC)({ w: 800, ...params })
 
 test('jpg without args', () => {
@@ -31,7 +30,7 @@ test('jpg without args', () => {
 })
 
 test('jpg with existing params without args', () => {
-  const rect = { x: 0, y: 0, w: 3600, h: 1800 }
+  const rect = '0,0,3600,1800'
   const result = buildImgixFluid({
     url: buildImgixUrl(URL_SRC)({ rect }),
     sourceWidth: URL_WIDTH,
@@ -60,13 +59,13 @@ test('jpg with maxWidth (600)', () => {
     args: { maxWidth: 600 },
   })
 
-  expect(result.src).toBe(buildTestUrl({ w: 600, h: 300 }))
+  expect(result.src).toBe(buildTestUrl({ w: 600 }))
   expect(splitSrcSet(result.srcSet)).toEqual([
-    [normalizeUrl(buildTestUrl({ w: 150, h: 75 })), '150w'],
-    [normalizeUrl(buildTestUrl({ w: 300, h: 150 })), '300w'],
-    [normalizeUrl(buildTestUrl({ w: 600, h: 300 })), '600w'],
-    [normalizeUrl(buildTestUrl({ w: 900, h: 450 })), '900w'],
-    [normalizeUrl(buildTestUrl({ w: 1200, h: 600 })), '1200w'],
+    [buildTestUrl({ w: 150, h: 75 }), '150w'],
+    [buildTestUrl({ w: 300, h: 150 }), '300w'],
+    [buildTestUrl({ w: 600, h: 300 }), '600w'],
+    [buildTestUrl({ w: 900, h: 450 }), '900w'],
+    [buildTestUrl({ w: 1200, h: 600 }), '1200w'],
   ])
   expect(result.srcSetWebp).toEqual(result.srcSet)
   expect(result.srcWebp).toEqual(result.src)
@@ -102,11 +101,11 @@ test('jpg with maxWidth (600) and maxHeight (400)', () => {
 
   expect(result.src).toBe(buildTestUrl({ w: 600, h: 400 }))
   expect(splitSrcSet(result.srcSet)).toEqual([
-    [buildTestUrl({ w: 150, h: 100 }), '150w'],
-    [buildTestUrl({ w: 300, h: 200 }), '300w'],
-    [buildTestUrl({ w: 600, h: 400 }), '600w'],
-    [buildTestUrl({ w: 900, h: 600 }), '900w'],
-    [buildTestUrl({ w: 1200, h: 800 }), '1200w'],
+    [buildTestUrl({ w: 150, h: 75 }), '150w'],
+    [buildTestUrl({ w: 300, h: 150 }), '300w'],
+    [buildTestUrl({ w: 600, h: 300 }), '600w'],
+    [buildTestUrl({ w: 900, h: 450 }), '900w'],
+    [buildTestUrl({ w: 1200, h: 600 }), '1200w'],
   ])
   expect(result.srcSetWebp).toEqual(result.srcSet)
   expect(result.srcWebp).toEqual(result.src)

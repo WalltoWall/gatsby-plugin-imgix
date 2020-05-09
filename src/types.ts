@@ -1,7 +1,7 @@
-export interface ImgixUrlParams {
-  w?: number
-  h?: number
-}
+export type ImgixUrlParams = Record<
+  string,
+  string | number | string[] | number[] | null | undefined
+>
 
 export interface ImgixFixedArgs {
   width?: number

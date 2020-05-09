@@ -1,8 +1,8 @@
 import { FixedObject, FluidObject } from 'gatsby-image'
-import { buildImgixUrl as _buildImgixUrl, ImgixUrlQueryParams } from 'ts-imgix'
 import { createHash } from 'crypto'
+import { paramCase } from 'param-case'
 
-import { ImgixFixedArgs, ImgixFluidArgs } from './types'
+import { ImgixUrlParams, ImgixFixedArgs, ImgixFluidArgs } from './types'
 
 export const DEFAULT_FIXED_WIDTH = 400
 export const DEFAULT_FLUID_MAX_WIDTH = 800
@@ -14,32 +14,45 @@ const FIXED_RESOLUTIONS = [1, 1.5, 2]
 const FLUID_BREAKPOINT_FACTORS = [0.25, 0.5, 1.5, 2]
 
 // Default params for placeholder images.
-const DEFAULT_LQIP_PARAMS: ImgixUrlQueryParams = { w: 100, blur: 15, q: 20 }
+const DEFAULT_LQIP_PARAMS: ImgixUrlParams = { w: 100, blur: 15, q: 20 }
 
 export const buildImgixUrl = (url: string, secureUrlToken?: string) => (
-  params: ImgixUrlQueryParams,
+  params: ImgixUrlParams,
 ): string => {
-  const imgixUrl = _buildImgixUrl(url)(params)
+  const instance = new URL(url)
 
-  if (!secureUrlToken) return imgixUrl
+  for (const param in params) {
+    const val = params[param as keyof ImgixUrlParams]
 
-  const parsed = new URL(imgixUrl)
+    if (val !== undefined && val !== null) {
+      // The input param name is camel-cased to appease the GraphQL field
+      // requirements. This is converted to param-case per the Imgix API.
+      const name = paramCase(param)
 
-  parsed.searchParams.delete('s')
+      instance.searchParams.set(name, String(val))
+    }
+  }
 
-  const signatureBase = secureUrlToken + parsed.pathname + parsed.search
-  const signature = createHash('md5').update(signatureBase).digest('hex')
+  // If a secure URL token is provided, sign the URL using its path and params.
+  if (secureUrlToken) {
+    // We don't want the existing signature as part of the computed params.
+    instance.searchParams.delete('s')
 
-  parsed.searchParams.append('s', signature)
+    const signatureBase = secureUrlToken + instance.pathname + instance.search
+    const signature = createHash('md5').update(signatureBase).digest('hex')
 
-  return parsed.href
+    // Ensure `s` is the last param.
+    instance.searchParams.append('s', signature)
+  }
+
+  return instance.href
 }
 
 const buildImgixLqipUrl: typeof buildImgixUrl = (...args) => (params): string =>
   buildImgixUrl(...args)({ ...params, ...DEFAULT_LQIP_PARAMS })
 
 const buildImgixFixedSrcSet = (baseUrl: string, secureUrlToken?: string) => (
-  params: ImgixUrlQueryParams,
+  params: ImgixUrlParams,
 ): string =>
   FIXED_RESOLUTIONS.map((resolution) => {
     const url = buildImgixUrl(
@@ -117,7 +130,7 @@ type BuildFluidSrcSetArgs = {
 }
 
 const buildImgixFluidSrcSet = (baseUrl: string, secureUrlToken?: string) => (
-  params: ImgixUrlQueryParams,
+  params: ImgixUrlParams,
 ) => ({
   aspectRatio,
   maxWidth,

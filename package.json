@@ -19,7 +19,7 @@
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test",
-    "lint": "eslint src --ext .ts",
+    "lint": "eslint src/**/*.ts",
     "prepare": "tsdx build",
     "release": "standard-version"
   },
@@ -36,8 +36,10 @@
     "images"
   ],
   "dependencies": {
+    "camel-case": "^4.1.1",
+    "imgix-url-params": "^11.4.3",
     "node-fetch": "^2.6.0",
-    "ts-imgix": "^0.0.11"
+    "param-case": "^3.0.3"
   },
   "peerDependencies": {
     "gatsby": ">= 2.20.0"
