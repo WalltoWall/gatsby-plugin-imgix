@@ -1,13 +1,13 @@
 import { Cache } from 'gatsby'
 import {
   GraphQLFieldConfig,
-  GraphQLFieldConfigArgumentMap,
   GraphQLInt,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
 } from 'gatsby/graphql'
 import { FixedObject } from 'gatsby-image'
+import { ComposeFieldConfigAsObject } from 'graphql-compose'
 
 import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
 import { buildImgixFixed, DEFAULT_FIXED_WIDTH } from './builders'
@@ -16,36 +16,22 @@ import {
   ImgixUrlParamsInputType,
   fetchImgixMetadata,
 } from './shared'
-import { ns, Maybe } from './utils'
+import { Maybe } from './utils'
 import { ImgixFixedArgs, ImgixUrlParams } from './types'
 
-const imgixFixedArgs = {
-  width: { type: GraphQLInt, defaultValue: DEFAULT_FIXED_WIDTH },
-  height: { type: GraphQLInt },
-  imgixParams: { type: ImgixUrlParamsInputType, defaultValue: {} },
-} as GraphQLFieldConfigArgumentMap
-
-interface CreateImgixFixedFieldConfigArgs<TSource> {
-  resolveUrl: ImgixResolveUrl<TSource>
-  secureUrlToken?: string
-  namespace?: string
+interface CreateImgixFixedTypeArgs {
+  name: string
   cache: Cache['cache']
-  defaultImgixParams?: ImgixUrlParams
+  secureUrlToken?: string
 }
 
-export const createImgixFixedFieldConfig = <TSource, TContext>({
-  resolveUrl,
-  secureUrlToken,
-  namespace,
+export const createImgixFixedType = ({
+  name,
   cache,
-  defaultImgixParams,
-}: CreateImgixFixedFieldConfigArgs<TSource>): GraphQLFieldConfig<
-  TSource,
-  TContext,
-  ImgixFixedArgs
-> => {
-  const ImgixFixedType = new GraphQLObjectType({
-    name: ns(namespace, 'ImgixFixed'),
+  secureUrlToken,
+}: CreateImgixFixedTypeArgs): GraphQLObjectType<FixedObject> =>
+  new GraphQLObjectType({
+    name,
     fields: {
       base64: createImgixBase64UrlFieldConfig({ cache, secureUrlToken }),
       src: { type: new GraphQLNonNull(GraphQLString) },
@@ -58,28 +44,66 @@ export const createImgixFixedFieldConfig = <TSource, TContext>({
     },
   })
 
-  return {
-    type: ImgixFixedType,
-    args: imgixFixedArgs,
-    resolve: async (obj, args): Promise<Maybe<FixedObject>> => {
-      const url = await resolveUrl(obj)
-      if (!url) return
-
-      const metadata = await fetchImgixMetadata({ url, cache, secureUrlToken })
-
-      return buildImgixFixed({
-        url,
-        sourceWidth: metadata.PixelWidth,
-        sourceHeight: metadata.PixelHeight,
-        secureUrlToken,
-        args: {
-          ...args,
-          imgixParams: {
-            ...defaultImgixParams,
-            ...args.imgixParams,
-          },
-        },
-      })
-    },
-  }
+interface CreateImgixFixedFieldConfigArgs<TSource> {
+  type: GraphQLObjectType<FixedObject>
+  resolveUrl: ImgixResolveUrl<TSource>
+  secureUrlToken?: string
+  cache: Cache['cache']
+  defaultImgixParams?: ImgixUrlParams
 }
+
+export const createImgixFixedFieldConfig = <TSource, TContext>({
+  type,
+  resolveUrl,
+  secureUrlToken,
+  cache,
+  defaultImgixParams,
+}: CreateImgixFixedFieldConfigArgs<TSource>): GraphQLFieldConfig<
+  TSource,
+  TContext,
+  ImgixFixedArgs
+> => ({
+  type,
+  args: {
+    width: {
+      type: GraphQLInt,
+      defaultValue: DEFAULT_FIXED_WIDTH,
+    },
+    height: {
+      type: GraphQLInt,
+    },
+    imgixParams: {
+      type: ImgixUrlParamsInputType,
+      defaultValue: {},
+    },
+  },
+  resolve: async (obj, args): Promise<Maybe<FixedObject>> => {
+    const url = await resolveUrl(obj)
+    if (!url) return
+
+    const metadata = await fetchImgixMetadata({ url, cache, secureUrlToken })
+
+    return buildImgixFixed({
+      url,
+      sourceWidth: metadata.PixelWidth,
+      sourceHeight: metadata.PixelHeight,
+      secureUrlToken,
+      args: {
+        ...args,
+        imgixParams: {
+          ...defaultImgixParams,
+          ...args.imgixParams,
+        },
+      },
+    })
+  },
+})
+
+export const createImgixFixedSchemaFieldConfig = <TSource, TContext>(
+  args: CreateImgixFixedFieldConfigArgs<TSource>,
+): ComposeFieldConfigAsObject<TSource, TContext, ImgixFixedArgs> =>
+  createImgixFixedFieldConfig(args) as ComposeFieldConfigAsObject<
+    TSource,
+    TContext,
+    ImgixFixedArgs
+  >

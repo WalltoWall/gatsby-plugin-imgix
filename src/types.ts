@@ -1,6 +1,6 @@
 export type ImgixUrlParams = Record<
   string,
-  string | number | string[] | number[] | null | undefined
+  string | number | boolean | null | undefined
 >
 
 export interface ImgixFixedArgs {

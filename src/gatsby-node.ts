@@ -6,11 +6,16 @@ import {
   Node,
   PluginOptions as GatsbyPluginOptions,
 } from 'gatsby'
-import { GraphQLObjectType, GraphQLList } from 'gatsby/graphql'
 
-import { createImgixUrlFieldConfig } from './createImgixUrlFieldConfig'
-import { createImgixFixedFieldConfig } from './createImgixFixedFieldConfig'
-import { createImgixFluidFieldConfig } from './createImgixFluidFieldConfig'
+import { createImgixUrlSchemaFieldConfig } from './createImgixUrlFieldConfig'
+import {
+  createImgixFixedSchemaFieldConfig,
+  createImgixFixedType,
+} from './createImgixFixedFieldConfig'
+import {
+  createImgixFluidSchemaFieldConfig,
+  createImgixFluidType,
+} from './createImgixFluidFieldConfig'
 import { invariant, transformUrlForWebProxy, ns } from './utils'
 import { ImgixUrlParams } from './types'
 
@@ -136,25 +141,35 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
     reporter,
   )
 
-  const ImgixImageType = new GraphQLObjectType({
+  const ImgixFixedType = createImgixFixedType({
+    name: ns(namespace, 'ImgixFixed'),
+    cache,
+  })
+
+  const ImgixFluidType = createImgixFluidType({
+    name: ns(namespace, 'ImgixFluid'),
+    cache,
+  })
+
+  const ImgixImageType = schema.buildObjectType({
     name: ns(namespace, 'ImgixImage'),
     fields: {
-      url: createImgixUrlFieldConfig({
+      url: createImgixUrlSchemaFieldConfig({
         resolveUrl: (url: string) => url,
         defaultImgixParams,
         secureUrlToken,
       }),
-      fixed: createImgixFixedFieldConfig({
+      fixed: createImgixFixedSchemaFieldConfig({
+        type: ImgixFixedType,
         resolveUrl: (url: string) => url,
         secureUrlToken,
-        namespace,
         defaultImgixParams,
         cache,
       }),
-      fluid: createImgixFluidFieldConfig({
+      fluid: createImgixFluidSchemaFieldConfig({
+        type: ImgixFluidType,
         resolveUrl: (url: string) => url,
         secureUrlToken: secureUrlToken,
-        namespace,
         defaultImgixParams,
         cache,
       }),
@@ -168,13 +183,14 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
         [fieldOptions.fieldName]: {
           type:
             'getUrls' in fieldOptions
-              ? new GraphQLList(ImgixImageType)
-              : ImgixImageType,
+              ? `[${ImgixImageType.config.name}]`
+              : ImgixImageType.config.name,
         },
       },
     }),
   )
 
+  createTypes([ImgixFixedType, ImgixFluidType])
   createTypes(ImgixImageType)
   createTypes(fieldTypes)
 }

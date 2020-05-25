@@ -1,8 +1,5 @@
-import {
-  GraphQLFieldConfig,
-  GraphQLFieldConfigArgumentMap,
-  GraphQLString,
-} from 'gatsby/graphql'
+import { GraphQLFieldConfig, GraphQLString } from 'gatsby/graphql'
+import { ComposeFieldConfigAsObject } from 'graphql-compose'
 
 import { buildImgixUrl } from './builders'
 import { ImgixResolveUrl, ImgixUrlParamsInputType } from './shared'
@@ -12,10 +9,6 @@ import { Maybe } from './utils'
 export interface ImgixUrlArgs {
   imgixParams?: ImgixUrlParams
 }
-
-const imgixUrlArgs = {
-  imgixParams: { type: ImgixUrlParamsInputType, defaultValue: {} },
-} as GraphQLFieldConfigArgumentMap
 
 interface CreateImgixUrlFieldConfigArgs<TSource> {
   resolveUrl: ImgixResolveUrl<TSource>
@@ -33,7 +26,12 @@ export const createImgixUrlFieldConfig = <TSource, TContext>({
   ImgixUrlArgs
 > => ({
   type: GraphQLString,
-  args: imgixUrlArgs,
+  args: {
+    imgixParams: {
+      type: ImgixUrlParamsInputType,
+      defaultValue: {},
+    },
+  },
   resolve: async (obj, args): Promise<Maybe<string>> => {
     const url = await resolveUrl(obj)
     if (!url) return
@@ -47,3 +45,12 @@ export const createImgixUrlFieldConfig = <TSource, TContext>({
     })
   },
 })
+
+export const createImgixUrlSchemaFieldConfig = <TSource, TContext>(
+  args: CreateImgixUrlFieldConfigArgs<TSource>,
+): ComposeFieldConfigAsObject<TSource, TContext, ImgixUrlArgs> =>
+  createImgixUrlFieldConfig(args) as ComposeFieldConfigAsObject<
+    TSource,
+    TContext,
+    ImgixUrlArgs
+  >

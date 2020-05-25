@@ -1,7 +1,6 @@
 import { Cache } from 'gatsby'
 import {
   GraphQLFieldConfig,
-  GraphQLFieldConfigArgumentMap,
   GraphQLFloat,
   GraphQLInt,
   GraphQLList,
@@ -10,6 +9,7 @@ import {
   GraphQLString,
 } from 'gatsby/graphql'
 import { FluidObject } from 'gatsby-image'
+import { ComposeFieldConfigAsObject } from 'graphql-compose'
 
 import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
 import { buildImgixFluid, DEFAULT_FLUID_MAX_WIDTH } from './builders'
@@ -18,37 +18,22 @@ import {
   ImgixUrlParamsInputType,
   fetchImgixMetadata,
 } from './shared'
-import { ns, Maybe } from './utils'
+import { Maybe } from './utils'
 import { ImgixFluidArgs, ImgixUrlParams } from './types'
 
-const imgixFluidArgs = {
-  maxWidth: { type: GraphQLInt, defaultValue: DEFAULT_FLUID_MAX_WIDTH },
-  maxHeight: { type: GraphQLInt },
-  srcSetBreakpoints: { type: new GraphQLList(GraphQLInt) },
-  imgixParams: { type: ImgixUrlParamsInputType, defaultValue: {} },
-} as GraphQLFieldConfigArgumentMap
-
-interface CreateImgixFluidFieldConfigArgs<TSource> {
-  resolveUrl: ImgixResolveUrl<TSource>
-  secureUrlToken?: string
-  namespace?: string
+interface CreateImgixFluidTypeArgs {
+  name: string
   cache: Cache['cache']
-  defaultImgixParams?: ImgixUrlParams
+  secureUrlToken?: string
 }
 
-export const createImgixFluidFieldConfig = <TSource, TContext>({
-  resolveUrl,
-  secureUrlToken,
-  namespace,
+export const createImgixFluidType = ({
+  name,
   cache,
-  defaultImgixParams,
-}: CreateImgixFluidFieldConfigArgs<TSource>): GraphQLFieldConfig<
-  TSource,
-  TContext,
-  ImgixFluidArgs
-> => {
-  const ImgixFluidType = new GraphQLObjectType({
-    name: ns(namespace, 'ImgixFluid'),
+  secureUrlToken,
+}: CreateImgixFluidTypeArgs): GraphQLObjectType<FluidObject> =>
+  new GraphQLObjectType({
+    name,
     fields: {
       base64: createImgixBase64UrlFieldConfig({ cache, secureUrlToken }),
       src: { type: new GraphQLNonNull(GraphQLString) },
@@ -60,28 +45,69 @@ export const createImgixFluidFieldConfig = <TSource, TContext>({
     },
   })
 
-  return {
-    type: ImgixFluidType,
-    args: imgixFluidArgs,
-    resolve: async (obj, args): Promise<Maybe<FluidObject>> => {
-      const url = await resolveUrl(obj)
-      if (!url) return
-
-      const metadata = await fetchImgixMetadata({ url, cache, secureUrlToken })
-
-      return buildImgixFluid({
-        url,
-        sourceWidth: metadata.PixelWidth,
-        sourceHeight: metadata.PixelHeight,
-        secureUrlToken,
-        args: {
-          ...args,
-          imgixParams: {
-            ...defaultImgixParams,
-            ...args.imgixParams,
-          },
-        },
-      })
-    },
-  }
+interface CreateImgixFluidFieldConfigArgs<TSource> {
+  type: GraphQLObjectType<FluidObject>
+  resolveUrl: ImgixResolveUrl<TSource>
+  secureUrlToken?: string
+  cache: Cache['cache']
+  defaultImgixParams?: ImgixUrlParams
 }
+
+export const createImgixFluidFieldConfig = <TSource, TContext>({
+  type,
+  resolveUrl,
+  secureUrlToken,
+  cache,
+  defaultImgixParams,
+}: CreateImgixFluidFieldConfigArgs<TSource>): GraphQLFieldConfig<
+  TSource,
+  TContext,
+  ImgixFluidArgs
+> => ({
+  type,
+  args: {
+    maxWidth: {
+      type: GraphQLInt,
+      defaultValue: DEFAULT_FLUID_MAX_WIDTH,
+    },
+    maxHeight: {
+      type: GraphQLInt,
+    },
+    srcSetBreakpoints: {
+      type: new GraphQLList(GraphQLInt),
+    },
+    imgixParams: {
+      type: ImgixUrlParamsInputType,
+      defaultValue: {},
+    },
+  },
+  resolve: async (obj, args): Promise<Maybe<FluidObject>> => {
+    const url = await resolveUrl(obj)
+    if (!url) return
+
+    const metadata = await fetchImgixMetadata({ url, cache, secureUrlToken })
+
+    return buildImgixFluid({
+      url,
+      sourceWidth: metadata.PixelWidth,
+      sourceHeight: metadata.PixelHeight,
+      secureUrlToken,
+      args: {
+        ...args,
+        imgixParams: {
+          ...defaultImgixParams,
+          ...args.imgixParams,
+        },
+      },
+    })
+  },
+})
+
+export const createImgixFluidSchemaFieldConfig = <TSource, TContext>(
+  args: CreateImgixFluidFieldConfigArgs<TSource>,
+): ComposeFieldConfigAsObject<TSource, TContext, ImgixFluidArgs> =>
+  createImgixFluidFieldConfig(args) as ComposeFieldConfigAsObject<
+    TSource,
+    TContext,
+    ImgixFluidArgs
+  >
