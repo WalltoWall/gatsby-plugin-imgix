@@ -37,6 +37,7 @@
   ],
   "dependencies": {
     "camel-case": "^4.1.1",
+    "fp-ts": "^2.6.1",
     "imgix-url-params": "^11.4.3",
     "node-fetch": "^2.6.0",
     "param-case": "^3.0.3"
