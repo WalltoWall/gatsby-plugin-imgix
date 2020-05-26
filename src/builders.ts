@@ -1,4 +1,10 @@
 import { FixedObject, FluidObject } from 'gatsby-image'
+import * as A from 'fp-ts/es6/Array'
+import * as R from 'fp-ts/es6/Record'
+import { Option } from 'fp-ts/es6/Option'
+import { eqNumber } from 'fp-ts/es6/Eq'
+import { ordNumber } from 'fp-ts/es6/Ord'
+import { pipe } from 'fp-ts/es6/pipeable'
 
 import { ImgixUrlParams, ImgixFixedArgs, ImgixFluidArgs } from './types'
 import {
@@ -7,11 +13,6 @@ import {
   semigroupImgixUrlParams,
   join,
 } from './utils'
-
-import { pipe } from 'fp-ts/es6/pipeable'
-import * as R from 'fp-ts/es6/Record'
-import * as A from 'fp-ts/es6/Array'
-import { Option } from 'fp-ts/es6/Option'
 
 export const DEFAULT_FIXED_WIDTH = 400
 export const DEFAULT_FLUID_MAX_WIDTH = 800
@@ -120,33 +121,30 @@ type BuildFluidSrcSetArgs = {
   srcSetBreakpoints?: number[]
 }
 
-const buildImgixFluidSrcSet = (baseUrl: string, secureUrlToken?: string) => (
-  params: ImgixUrlParams,
-) => ({
+const buildImgixFluidSrcSet = (
+  baseUrl: string,
+  secureUrlToken: Option<string>,
+) => (params: ImgixUrlParams) => ({
   aspectRatio,
   maxWidth,
   srcSetBreakpoints = FLUID_BREAKPOINT_FACTORS.map((x) => maxWidth * x),
-}: BuildFluidSrcSetArgs): string => {
-  // Remove duplicates, sort by numerical value, and ensure maxWidth is added.
-  const uniqSortedBreakpoints = Array.from(
-    new Set([...srcSetBreakpoints, maxWidth]),
-  ).sort((a, b) => a - b)
-
-  return uniqSortedBreakpoints
-    .map((breakpoint) => {
-      const url = buildImgixUrl(
-        baseUrl,
-        secureUrlToken,
-      )({
-        ...params,
-        w: breakpoint,
-        h: Math.round(breakpoint / aspectRatio),
-      })
-
-      return `${url} ${Math.round(breakpoint)}w`
-    })
-    .join(', ')
-}
+}: BuildFluidSrcSetArgs): string =>
+  pipe(
+    A.cons(maxWidth, srcSetBreakpoints),
+    A.uniq(eqNumber),
+    A.sort(ordNumber),
+    A.map((breakpoint) =>
+      pipe(
+        semigroupImgixUrlParams.concat(params, {
+          w: Math.round(breakpoint),
+          h: Math.round(breakpoint / aspectRatio),
+        }),
+        buildImgixUrl(baseUrl, secureUrlToken),
+        (url) => `${url} ${Math.round(breakpoint)}`,
+      ),
+    ),
+    join(', '),
+  )
 
 type BuildImgixFluidArgs = {
   url: string

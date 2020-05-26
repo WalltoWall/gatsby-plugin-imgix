@@ -7,22 +7,21 @@ import {
   GraphQLString,
   GraphQLBoolean,
 } from 'gatsby/graphql'
-import { camelCase } from 'camel-case'
 import imgixUrlParameters from 'imgix-url-params/dist/parameters.json'
-import { pipe } from 'fp-ts/es6/pipeable'
+import { camelCase } from 'camel-case'
 import * as TE from 'fp-ts/es6/TaskEither'
 import { Option } from 'fp-ts/es6/Option'
+import { pipe } from 'fp-ts/es6/pipeable'
 import { sequenceS } from 'fp-ts/es6/Apply'
 
+import { buildImgixUrl } from './builders'
 import {
   Nullable,
   OptionalPromise,
   getFromCacheOr,
   fetchBase64,
-  setURLSearchParam,
   fetchJSON,
   buildBase64URL,
-  signURL,
 } from './utils'
 
 export const ImgixUrlParamsInputType = new GraphQLInputObjectType({
@@ -103,15 +102,9 @@ export const fetchImgixMetadata = (
   cache: Cache['cache'],
   secureUrlToken: Option<string>,
 ) => (url: string): TE.TaskEither<Error, ImgixMetadata> =>
-  pipe(
-    `gatsby-plugin-imgix-metadata-url-${url}`,
-    getFromCacheOr(cache, () =>
-      pipe(
-        url,
-        setURLSearchParam('fm', 'json'),
-        signURL(secureUrlToken),
-        (signedUrl) => fetchJSON(signedUrl),
-      ),
+  getFromCacheOr(`gatsby-plugin-imgix-metadata-${url}`, cache, () =>
+    pipe({ fm: 'json' }, buildImgixUrl(url, secureUrlToken), (u) =>
+      fetchJSON(u),
     ),
   )
 
@@ -119,18 +112,15 @@ export const fetchImgixBase64Url = (
   cache: Cache['cache'],
   secureUrlToken: Option<string>,
 ) => (url: string): TE.TaskEither<Error, string> =>
-  pipe(
-    `gatsby-plugin-imgix-base64-url-${url}`,
-    getFromCacheOr(cache, () =>
-      pipe(
-        {
-          metadata: fetchImgixMetadata(cache, secureUrlToken)(url),
-          base64: fetchBase64(url),
-        },
-        sequenceS(TE.taskEither),
-        TE.map(({ metadata, base64 }) =>
-          buildBase64URL(metadata['Content-Type'], base64),
-        ),
+  getFromCacheOr(`gatsby-plugin-imgix-base64-url-${url}`, cache, () =>
+    pipe(
+      {
+        metadata: fetchImgixMetadata(cache, secureUrlToken)(url),
+        base64: fetchBase64(url),
+      },
+      sequenceS(TE.taskEither),
+      TE.map(({ metadata, base64 }) =>
+        buildBase64URL(metadata['Content-Type'], base64),
       ),
     ),
   )
