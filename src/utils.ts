@@ -6,9 +6,11 @@ import * as TE from 'fp-ts/es6/TaskEither'
 import { flow } from 'fp-ts/es6/function'
 import { pipe } from 'fp-ts/es6/pipeable'
 import { Option } from 'fp-ts/es6/Option'
-import { Semigroup } from 'fp-ts/es6/Semigroup'
+import { Semigroup, getObjectSemigroup } from 'fp-ts/es6/Semigroup'
 import { Task } from 'fp-ts/es6/Task'
 import { TaskEither } from 'fp-ts/es6/TaskEither'
+
+import { ImgixUrlParams } from './types'
 
 export type Maybe<T> = T | undefined
 export type Nullable<T> = Maybe<T | null>
@@ -110,12 +112,28 @@ export const deleteURLSearchParam = (key: string) => (url: string): string => {
   return u.toString()
 }
 
-const semigroupUrlSearchParams: Semigroup<URLSearchParams> = {
+export const semigroupImgixUrlParams = getObjectSemigroup<ImgixUrlParams>()
+
+const semigroupURLSearchParams: Semigroup<URLSearchParams> = {
   concat: (x, y) => {
     const product = new URLSearchParams(x.toString())
     y.forEach((value, key) => product.set(key, value))
     return product
   },
+}
+
+export const setURLSearchParams = <A extends Record<string, string>>(
+  url: string,
+) => (params: A): string => {
+  const u = new URL(url)
+
+  const mergedParams = semigroupURLSearchParams.concat(
+    u.searchParams,
+    new URLSearchParams(params),
+  )
+  u.search = mergedParams.toString()
+
+  return u.toString()
 }
 
 export const md5 = (input: BinaryLike): string =>
@@ -144,3 +162,6 @@ export const signURL = (secureUrlToken: Option<string>) => (
         ),
     ),
   )
+
+export const join = <A>(separator?: string) => (arr: A[]): string =>
+  arr.join(separator)

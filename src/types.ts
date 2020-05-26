@@ -1,6 +1,13 @@
-export type ImgixUrlParams = Record<
-  string,
-  string | number | boolean | null | undefined
+import imgixUrlParameters from 'imgix-url-params/dist/parameters.json'
+
+type ImgixUrlParametersSpec = typeof imgixUrlParameters
+
+export type ImgixUrlParams = Partial<
+  Record<
+    | keyof ImgixUrlParametersSpec['parameters']
+    | keyof ImgixUrlParametersSpec['aliases'],
+    string | number | boolean
+  >
 >
 
 export interface ImgixFixedArgs {

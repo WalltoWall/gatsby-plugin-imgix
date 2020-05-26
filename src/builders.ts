@@ -1,8 +1,17 @@
 import { FixedObject, FluidObject } from 'gatsby-image'
-import { createHash } from 'crypto'
-import { paramCase } from 'param-case'
 
 import { ImgixUrlParams, ImgixFixedArgs, ImgixFluidArgs } from './types'
+import {
+  setURLSearchParams,
+  signURL,
+  semigroupImgixUrlParams,
+  join,
+} from './utils'
+
+import { pipe } from 'fp-ts/es6/pipeable'
+import * as R from 'fp-ts/es6/Record'
+import * as A from 'fp-ts/es6/Array'
+import { Option } from 'fp-ts/es6/Option'
 
 export const DEFAULT_FIXED_WIDTH = 400
 export const DEFAULT_FLUID_MAX_WIDTH = 800
@@ -16,52 +25,34 @@ const FLUID_BREAKPOINT_FACTORS = [0.25, 0.5, 1.5, 2]
 // Default params for placeholder images.
 const DEFAULT_LQIP_PARAMS: ImgixUrlParams = { w: 100, blur: 15, q: 20 }
 
-export const buildImgixUrl = (url: string, secureUrlToken?: string) => (
-  params: ImgixUrlParams,
-): string => {
-  const instance = new URL(url)
-
-  for (const param in params) {
-    const val = params[param as keyof ImgixUrlParams]
-
-    if (val !== undefined && val !== null) {
-      // The input param name is camel-cased to appease the GraphQL field
-      // requirements. This is converted to param-case per the Imgix API.
-      const name = paramCase(param)
-
-      instance.searchParams.set(name, String(val))
-    }
-  }
-
-  // If a secure URL token is provided, sign the URL using its path and params.
-  if (secureUrlToken) {
-    // We don't want the existing signature as part of the computed params.
-    instance.searchParams.delete('s')
-
-    const signatureBase = secureUrlToken + instance.pathname + instance.search
-    const signature = createHash('md5').update(signatureBase).digest('hex')
-
-    // Ensure `s` is the last param.
-    instance.searchParams.append('s', signature)
-  }
-
-  return instance.href
-}
-
-const buildImgixLqipUrl: typeof buildImgixUrl = (...args) => (params): string =>
-  buildImgixUrl(...args)({ ...params, ...DEFAULT_LQIP_PARAMS })
-
-const buildImgixFixedSrcSet = (baseUrl: string, secureUrlToken?: string) => (
+export const buildImgixUrl = (url: string, secureUrlToken: Option<string>) => (
   params: ImgixUrlParams,
 ): string =>
-  FIXED_RESOLUTIONS.map((resolution) => {
-    const url = buildImgixUrl(
-      baseUrl,
-      secureUrlToken,
-    )({ ...params, dpr: resolution })
+  pipe(params, R.map(String), setURLSearchParams(url), signURL(secureUrlToken))
 
-    return `${url} ${resolution}x`
-  }).join(', ')
+const buildImgixLqipUrl = (url: string, secureUrlToken: Option<string>) => (
+  params: ImgixUrlParams,
+): string =>
+  pipe(
+    semigroupImgixUrlParams.concat(params, DEFAULT_LQIP_PARAMS),
+    buildImgixUrl(url, secureUrlToken),
+  )
+
+const buildImgixFixedSrcSet = (
+  baseUrl: string,
+  secureUrlToken: Option<string>,
+) => (params: ImgixUrlParams): string =>
+  pipe(
+    FIXED_RESOLUTIONS,
+    A.map((dpr) =>
+      pipe(
+        semigroupImgixUrlParams.concat(params, { dpr }),
+        buildImgixUrl(baseUrl, secureUrlToken),
+        (url) => `${url} ${dpr}x`,
+      ),
+    ),
+    join(', '),
+  )
 
 type BuildImgixFixedArgs = {
   url: string
