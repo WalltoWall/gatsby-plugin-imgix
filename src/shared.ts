@@ -7,18 +7,23 @@ import {
   GraphQLString,
   GraphQLBoolean,
 } from 'gatsby/graphql'
-import _fetch, { Response } from 'node-fetch'
 import { camelCase } from 'camel-case'
 import imgixUrlParameters from 'imgix-url-params/dist/parameters.json'
 import { pipe } from 'fp-ts/es6/pipeable'
-import * as T from 'fp-ts/es6/Task'
 import * as TE from 'fp-ts/es6/TaskEither'
-import * as O from 'fp-ts/es6/Option'
+import { Option } from 'fp-ts/es6/Option'
+import { sequenceS } from 'fp-ts/es6/Apply'
 
-import { buildImgixUrl } from './builders'
-import { Nullable, OptionalPromise } from './utils'
-import { semigroupString, Semigroup } from 'fp-ts/es6/Semigroup'
-import { flow } from 'fp-ts/es6/function'
+import {
+  Nullable,
+  OptionalPromise,
+  getFromCacheOr,
+  fetchBase64,
+  setURLSearchParam,
+  fetchJSON,
+  buildBase64URL,
+  signURL,
+} from './utils'
 
 export const ImgixUrlParamsInputType = new GraphQLInputObjectType({
   name: 'ImgixUrlParamsInput',
@@ -94,101 +99,38 @@ interface ImgixMetadata {
   PixelHeight: number
 }
 
-interface GetImgixMetadataArgs {
-  url: string
-  cache: Cache['cache']
-  secureUrlToken?: string
-}
-
-export const fetchImgixMetadata = async ({
-  url,
-  cache,
-  secureUrlToken,
-}: GetImgixMetadataArgs): Promise<ImgixMetadata> => {
-  const cacheKey = `gatsby-plugin-imgix-metadata-${url}`
-  const cached = await cache.get(cacheKey)
-  if (cached) return cached
-
-  const instance = new URL(url)
-  instance.searchParams.set('fm', 'json')
-  const unsignedJsonUrl = instance.href
-
-  const jsonUrl = buildImgixUrl(unsignedJsonUrl, secureUrlToken)({})
-  const res = await _fetch(jsonUrl)
-  const metadata = (await res.json()) as ImgixMetadata
-
-  cache.set(cacheKey, metadata)
-
-  return metadata
-}
-
-interface FetchImgixBase64UrlArgs {
-  url: string
-  cache: Cache['cache']
-  secureUrlToken?: string
-}
-
-export const fetchImgixBase64Url = async ({
-  url,
-  cache,
-  secureUrlToken,
-}: FetchImgixBase64UrlArgs): Promise<string> => {
-  const cacheKey = `gatsby-plugin-imgix-base64-url-${url}`
-  const cachedValue = await cache.get(cacheKey)
-  if (cachedValue) return cachedValue
-
-  const res = await _fetch(url)
-  const buffer = await res.buffer()
-  const base64 = buffer.toString('base64')
-
-  const metadata = await fetchImgixMetadata({ url, cache, secureUrlToken })
-  const base64URL = `data:${metadata['Content-Type']};base64,${base64}`
-
-  cache.set(cacheKey, base64URL)
-
-  return base64URL
-}
-
-// getFromCache :: Cache -> String -> Task Option String
-const getFromCache = <A>(cache: Cache['cache']) => (
-  key: string,
-): T.Task<O.Option<A>> => (): Promise<O.Option<A>> =>
-  cache.get(key).then((value?: A) => O.fromNullable(value))
-
-// fetch :: String -> TaskEither Error Response
-const fetch = (url: string): TE.TaskEither<Error, Response> =>
-  TE.tryCatch(
-    () => _fetch(url),
-    (reason) => new Error(String(reason)),
-  )
-
-// fetchImgixBase64Url2 ::
-export const fetchImgixMetadata2 = (
+export const fetchImgixMetadata = (
   cache: Cache['cache'],
-  secureUrlToken?: string,
-) => (url: string): TE.TaskEither<Error, string> =>
+  secureUrlToken: Option<string>,
+) => (url: string): TE.TaskEither<Error, ImgixMetadata> =>
   pipe(
     `gatsby-plugin-imgix-metadata-url-${url}`,
-    getFromCache<string>(cache),
-    TE.rightTask,
-    TE.chain(O.fold(() => fetchBase64(url), TE.right)),
+    getFromCacheOr(cache, () =>
+      pipe(
+        url,
+        setURLSearchParam('fm', 'json'),
+        signURL(secureUrlToken),
+        (signedUrl) => fetchJSON(signedUrl),
+      ),
+    ),
   )
 
-// fetchBase64 :: String -> TaskEither Error String
-const fetchBase64 = flow(
-  fetch,
-  TE.chain((res) => TE.rightTask((): Promise<Buffer> => res.buffer())),
-  TE.chain((res) => TE.right(res.toString('base64'))),
-)
-
-// fetchImgixBase64Url2 ::
-export const fetchImgixBase64Url2 = (
+export const fetchImgixBase64Url = (
   cache: Cache['cache'],
-  secureUrlToken?: string,
+  secureUrlToken: Option<string>,
 ) => (url: string): TE.TaskEither<Error, string> =>
   pipe(
     `gatsby-plugin-imgix-base64-url-${url}`,
-    getFromCache<string>(cache),
-    TE.rightTask,
-    TE.chain(O.fold(() => fetchBase64(url), TE.right)),
+    getFromCacheOr(cache, () =>
+      pipe(
+        {
+          metadata: fetchImgixMetadata(cache, secureUrlToken)(url),
+          base64: fetchBase64(url),
+        },
+        sequenceS(TE.taskEither),
+        TE.map(({ metadata, base64 }) =>
+          buildBase64URL(metadata['Content-Type'], base64),
+        ),
+      ),
+    ),
   )
