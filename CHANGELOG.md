@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.1](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.6.0...v0.6.1) (2020-05-31)
+
+
+### Bug Fixes
+
+* use correct srcSet descriptor ([b6f3efe](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/b6f3efee042999449d927145048788baffc11492))
+
 ## [0.6.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.5.0...v0.6.0) (2020-05-31)
 
 
