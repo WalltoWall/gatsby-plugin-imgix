@@ -114,8 +114,6 @@ export const createImgixFixedFieldConfig = <TSource, TContext>({
                     ...args.imgixParams,
                   },
                   placeholderImgixParams: {
-                    ...defaultImgixParams,
-                    ...args.imgixParams,
                     ...defaultPlaceholderImgixParams,
                     ...args.placeholderImgixParams,
                   },

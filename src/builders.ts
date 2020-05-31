@@ -109,7 +109,10 @@ export const buildImgixFixed = ({
   const base64 = buildImgixLqipUrl(
     url,
     secureUrlToken,
-  )(args.placeholderImgixParams ?? {})
+  )({
+    ...args.imgixParams,
+    ...args.placeholderImgixParams,
+  })
 
   const src = buildImgixUrl(
     url,
@@ -199,7 +202,10 @@ export const buildImgixFluid = ({
   const base64 = buildImgixLqipUrl(
     url,
     secureUrlToken,
-  )(args.placeholderImgixParams ?? {})
+  )({
+    ...args.imgixParams,
+    ...args.placeholderImgixParams,
+  })
 
   const src = buildImgixUrl(
     url,

@@ -118,8 +118,6 @@ export const createImgixFluidFieldConfig = <TSource, TContext>({
                     ...args.imgixParams,
                   },
                   placeholderImgixParams: {
-                    ...defaultImgixParams,
-                    ...args.imgixParams,
                     ...defaultPlaceholderImgixParams,
                     ...args.placeholderImgixParams,
                   },
