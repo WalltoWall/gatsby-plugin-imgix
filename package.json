@@ -22,7 +22,7 @@
     "build": "yarn clean && microbundle build src/index.ts src/node.ts src/gatsby-node.ts -o dist -f modern,cjs",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
-    "prepare": "NODE_ENV=production yarn run clean && yarn build",
+    "prepare": "yarn build",
     "release": "standard-version"
   },
   "author": "Angelo Ashmore",
