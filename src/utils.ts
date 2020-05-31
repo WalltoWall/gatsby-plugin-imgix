@@ -1,7 +1,9 @@
 import _fetch, { Response } from 'node-fetch'
 import { GatsbyCache, Reporter } from 'gatsby'
 import md5 from 'md5'
+import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
+import * as R from 'fp-ts/lib/Record'
 import * as TE from 'fp-ts/lib/TaskEither'
 import { Option } from 'fp-ts/lib/Option'
 import { Semigroup, getObjectSemigroup } from 'fp-ts/lib/Semigroup'
@@ -117,20 +119,38 @@ export const semigroupImgixUrlParams = getObjectSemigroup<ImgixUrlParams>()
 const semigroupURLSearchParams: Semigroup<URLSearchParams> = {
   concat: (x, y) => {
     const product = new URLSearchParams(x.toString())
-    y.forEach((value, key) => product.set(key, value))
+    y.forEach((value, key) => {
+      value === undefined || value === null
+        ? product.delete(key)
+        : product.set(key, value)
+    })
     return product
   },
 }
 
 export const setURLSearchParams = <K extends string>(url: string) => (
-  params: Record<K, string>,
+  params: Record<K, string | undefined>,
 ): string => {
   const u = new URL(url)
 
+  const undefParams: K[] = pipe(
+    params,
+    R.reduceWithIndex([] as K[], (key, acc, value) =>
+      value === undefined ? A.cons(key, acc) : acc,
+    ),
+  )
+  const defParams = pipe(
+    params,
+    R.filter((param) => param !== undefined),
+  ) as Record<K, string>
+
   const mergedParams = semigroupURLSearchParams.concat(
     u.searchParams,
-    new URLSearchParams(params),
+    new URLSearchParams(defParams),
   )
+  mergedParams.forEach((_, key) => {
+    if (undefParams.includes(key as K)) mergedParams.delete(key)
+  })
   u.search = mergedParams.toString()
 
   return u.toString()

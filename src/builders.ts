@@ -32,8 +32,10 @@ export const buildImgixUrl = (url: string, secureUrlToken: Option<string>) => (
 ): string =>
   pipe(
     params,
+    // TODO: Replace filterMap with map. filterMap is being used here just
+    // because it fibs the types a bit.
     R.filterMap((param) =>
-      typeof param === undefined ? O.none : O.some(String(param)),
+      param === undefined ? O.some(undefined) : O.some(String(param)),
     ),
     setURLSearchParams(url),
     signURL(secureUrlToken),
@@ -43,7 +45,7 @@ const buildImgixLqipUrl = (url: string, secureUrlToken: Option<string>) => (
   params: ImgixUrlParams,
 ): string =>
   pipe(
-    semigroupImgixUrlParams.concat(params, DEFAULT_LQIP_PARAMS),
+    semigroupImgixUrlParams.concat(DEFAULT_LQIP_PARAMS, params),
     buildImgixUrl(url, secureUrlToken),
   )
 
@@ -104,15 +106,28 @@ export const buildImgixFixed = ({
     height = Math.round(width / aspectRatio)
   }
 
-  const base64 = buildImgixLqipUrl(url, secureUrlToken)(args.imgixParams ?? {})
+  const base64 = buildImgixLqipUrl(
+    url,
+    secureUrlToken,
+  )(args.placeholderImgixParams ?? {})
+
   const src = buildImgixUrl(
     url,
     secureUrlToken,
-  )({ ...args.imgixParams, w: width, h: height })
+  )({
+    ...args.imgixParams,
+    w: width,
+    h: height,
+  })
+
   const srcSet = buildImgixFixedSrcSet(
     url,
     secureUrlToken,
-  )({ ...args.imgixParams, w: width, h: height })
+  )({
+    ...args.imgixParams,
+    w: width,
+    h: height,
+  })
 
   return {
     base64,
@@ -181,7 +196,11 @@ export const buildImgixFluid = ({
   const aspectRatio = sourceWidth / sourceHeight
   const maxWidth = args.maxWidth ?? DEFAULT_FLUID_MAX_WIDTH
 
-  const base64 = buildImgixLqipUrl(url, secureUrlToken)(args.imgixParams ?? {})
+  const base64 = buildImgixLqipUrl(
+    url,
+    secureUrlToken,
+  )(args.placeholderImgixParams ?? {})
+
   const src = buildImgixUrl(
     url,
     secureUrlToken,
@@ -190,6 +209,7 @@ export const buildImgixFluid = ({
     w: maxWidth,
     h: args.maxHeight,
   })
+
   const srcSet = buildImgixFluidSrcSet(
     url,
     secureUrlToken,

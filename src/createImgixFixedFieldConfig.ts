@@ -54,6 +54,7 @@ interface CreateImgixFixedFieldConfigArgs<TSource> {
   secureUrlToken?: string
   cache: GatsbyCache
   defaultImgixParams?: ImgixUrlParams
+  defaultPlaceholderImgixParams?: ImgixUrlParams
 }
 
 export const createImgixFixedFieldConfig = <TSource, TContext>({
@@ -62,6 +63,7 @@ export const createImgixFixedFieldConfig = <TSource, TContext>({
   secureUrlToken: rawSecureUrlToken,
   cache,
   defaultImgixParams,
+  defaultPlaceholderImgixParams,
 }: CreateImgixFixedFieldConfigArgs<TSource>): GraphQLFieldConfig<
   TSource,
   TContext,
@@ -80,6 +82,10 @@ export const createImgixFixedFieldConfig = <TSource, TContext>({
         type: GraphQLInt,
       },
       imgixParams: {
+        type: ImgixUrlParamsInputType,
+        defaultValue: {},
+      },
+      placeholderImgixParams: {
         type: ImgixUrlParamsInputType,
         defaultValue: {},
       },
@@ -106,6 +112,12 @@ export const createImgixFixedFieldConfig = <TSource, TContext>({
                   imgixParams: {
                     ...defaultImgixParams,
                     ...args.imgixParams,
+                  },
+                  placeholderImgixParams: {
+                    ...defaultImgixParams,
+                    ...args.imgixParams,
+                    ...defaultPlaceholderImgixParams,
+                    ...args.placeholderImgixParams,
                   },
                 },
               }),

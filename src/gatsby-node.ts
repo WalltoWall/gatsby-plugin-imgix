@@ -48,6 +48,7 @@ interface PluginOptions extends GatsbyPluginOptions {
   sourceType?: ImgixSourceType
   namespace?: string
   defaultImgixParams?: ImgixUrlParams
+  defaultPlaceholderImgixParams?: ImgixUrlParams
   fields?: FieldOptions[]
 }
 
@@ -128,6 +129,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
     sourceType,
     namespace,
     defaultImgixParams,
+    defaultPlaceholderImgixParams,
     fields = [],
   } = pluginOptions
   invariant(
@@ -156,14 +158,15 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
     fields: {
       url: createImgixUrlSchemaFieldConfig({
         resolveUrl: (url: string) => url,
-        defaultImgixParams,
         secureUrlToken,
+        defaultImgixParams,
       }),
       fixed: createImgixFixedSchemaFieldConfig({
         type: ImgixFixedType,
         resolveUrl: (url: string) => url,
         secureUrlToken,
         defaultImgixParams,
+        defaultPlaceholderImgixParams,
         cache,
       }),
       fluid: createImgixFluidSchemaFieldConfig({
@@ -171,6 +174,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
         resolveUrl: (url: string) => url,
         secureUrlToken: secureUrlToken,
         defaultImgixParams,
+        defaultPlaceholderImgixParams,
         cache,
       }),
     },

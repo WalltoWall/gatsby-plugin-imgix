@@ -14,6 +14,7 @@ export interface ImgixFixedArgs {
   width?: number
   height?: number
   imgixParams?: ImgixUrlParams
+  placeholderImgixParams?: ImgixUrlParams
 }
 
 export interface ImgixFluidArgs {
@@ -21,6 +22,7 @@ export interface ImgixFluidArgs {
   maxHeight?: number
   srcSetBreakpoints?: number[]
   imgixParams?: ImgixUrlParams
+  placeholderImgixParams?: ImgixUrlParams
 }
 
 export interface ImgixMetadata {
