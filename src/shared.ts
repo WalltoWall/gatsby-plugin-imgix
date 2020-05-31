@@ -14,6 +14,7 @@ import { Option } from 'fp-ts/es6/Option'
 import { pipe } from 'fp-ts/es6/pipeable'
 import { sequenceS } from 'fp-ts/es6/Apply'
 
+import { ImgixMetadata } from './types'
 import { buildImgixUrl } from './builders'
 import {
   Nullable,
@@ -91,12 +92,6 @@ export const ImgixUrlParamsInputType = new GraphQLInputObjectType({
 export type ImgixResolveUrl<TSource> = (
   obj: TSource,
 ) => OptionalPromise<Nullable<string>>
-
-interface ImgixMetadata {
-  'Content-Type': string
-  PixelWidth: number
-  PixelHeight: number
-}
 
 export const fetchImgixMetadata = (
   cache: Cache['cache'],

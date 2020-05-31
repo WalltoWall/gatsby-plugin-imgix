@@ -5,9 +5,14 @@ import {
   GraphQLFieldConfig,
 } from 'gatsby/graphql'
 import { FixedObject, FluidObject } from 'gatsby-image'
+import * as O from 'fp-ts/es6/Option'
+import * as T from 'fp-ts/es6/Task'
+import * as TE from 'fp-ts/es6/TaskEither'
+import { Task } from 'fp-ts/es6/Task'
+import { pipe } from 'fp-ts/es6/pipeable'
 
 import { fetchImgixBase64Url, ImgixResolveUrl } from './shared'
-import { Maybe } from './utils'
+import { taskEitherFromUrlResolver } from './utils'
 
 interface CreateImgixBase64UrlFieldConfigArgs {
   resolveUrl?: ImgixResolveUrl<FixedObject | FluidObject>
@@ -16,18 +21,23 @@ interface CreateImgixBase64UrlFieldConfigArgs {
 }
 
 export const createImgixBase64UrlFieldConfig = <TContext>({
-  resolveUrl = (obj): Maybe<string> => obj.base64,
-  secureUrlToken,
+  resolveUrl = (obj): string | null | undefined => obj.base64,
+  secureUrlToken: rawSecureUrlToken,
   cache,
 }: CreateImgixBase64UrlFieldConfigArgs): GraphQLFieldConfig<
   FixedObject | FluidObject,
   TContext
-> => ({
-  type: new GraphQLNonNull(GraphQLString),
-  resolve: async (obj): Promise<Maybe<string>> => {
-    const url = await resolveUrl(obj)
-    if (!url) return
+> => {
+  const secureUrlToken = O.fromNullable(rawSecureUrlToken)
 
-    return await fetchImgixBase64Url({ url, cache, secureUrlToken })
-  },
-})
+  return {
+    type: new GraphQLNonNull(GraphQLString),
+    resolve: (obj): Task<string | undefined> =>
+      pipe(
+        obj,
+        taskEitherFromUrlResolver(resolveUrl),
+        TE.chain(fetchImgixBase64Url(cache, secureUrlToken)),
+        TE.fold(() => T.of(undefined), T.of),
+      ),
+  }
+}

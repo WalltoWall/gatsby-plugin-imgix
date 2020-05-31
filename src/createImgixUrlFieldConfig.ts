@@ -1,10 +1,15 @@
 import { GraphQLFieldConfig, GraphQLString } from 'gatsby/graphql'
 import { ComposeFieldConfigAsObject } from 'graphql-compose'
+import * as O from 'fp-ts/es6/Option'
+import * as T from 'fp-ts/es6/Task'
+import * as TE from 'fp-ts/es6/TaskEither'
+import { Task } from 'fp-ts/es6/Task'
+import { pipe } from 'fp-ts/es6/pipeable'
 
 import { buildImgixUrl } from './builders'
 import { ImgixResolveUrl, ImgixUrlParamsInputType } from './shared'
 import { ImgixUrlParams } from './types'
-import { Maybe } from './utils'
+import { taskEitherFromUrlResolver, semigroupImgixUrlParams } from './utils'
 
 export interface ImgixUrlArgs {
   imgixParams?: ImgixUrlParams
@@ -18,33 +23,40 @@ interface CreateImgixUrlFieldConfigArgs<TSource> {
 
 export const createImgixUrlFieldConfig = <TSource, TContext>({
   resolveUrl,
-  secureUrlToken,
-  defaultImgixParams,
+  secureUrlToken: rawSecureUrlToken,
+  defaultImgixParams = {},
 }: CreateImgixUrlFieldConfigArgs<TSource>): GraphQLFieldConfig<
   TSource,
   TContext,
   ImgixUrlArgs
-> => ({
-  type: GraphQLString,
-  args: {
-    imgixParams: {
-      type: ImgixUrlParamsInputType,
-      defaultValue: {},
-    },
-  },
-  resolve: async (obj, args): Promise<Maybe<string>> => {
-    const url = await resolveUrl(obj)
-    if (!url) return
+> => {
+  const secureUrlToken = O.fromNullable(rawSecureUrlToken)
 
-    return buildImgixUrl(
-      url,
-      secureUrlToken,
-    )({
-      ...defaultImgixParams,
-      ...args.imgixParams,
-    })
-  },
-})
+  return {
+    type: GraphQLString,
+    args: {
+      imgixParams: {
+        type: ImgixUrlParamsInputType,
+        defaultValue: {},
+      },
+    },
+    resolve: (obj, args): Task<string | undefined> =>
+      pipe(
+        obj,
+        taskEitherFromUrlResolver(resolveUrl),
+        TE.map((url) =>
+          pipe(
+            semigroupImgixUrlParams.concat(
+              defaultImgixParams,
+              args.imgixParams ?? {},
+            ),
+            buildImgixUrl(url, secureUrlToken),
+          ),
+        ),
+        TE.fold(() => T.of(undefined), T.of),
+      ),
+  }
+}
 
 export const createImgixUrlSchemaFieldConfig = <TSource, TContext>(
   args: CreateImgixUrlFieldConfigArgs<TSource>,

@@ -6,7 +6,7 @@ export type ImgixUrlParams = Partial<
   Record<
     | keyof ImgixUrlParametersSpec['parameters']
     | keyof ImgixUrlParametersSpec['aliases'],
-    string | number | boolean
+    string | number | boolean | undefined
   >
 >
 
@@ -21,4 +21,10 @@ export interface ImgixFluidArgs {
   maxHeight?: number
   srcSetBreakpoints?: number[]
   imgixParams?: ImgixUrlParams
+}
+
+export interface ImgixMetadata {
+  'Content-Type': string
+  PixelWidth: number
+  PixelHeight: number
 }

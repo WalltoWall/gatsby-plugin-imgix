@@ -11,6 +11,7 @@ import { flow } from 'fp-ts/es6/function'
 import { pipe } from 'fp-ts/es6/pipeable'
 
 import { ImgixUrlParams } from './types'
+import { ImgixResolveUrl } from './shared'
 
 export type Maybe<T> = T | undefined
 export type Nullable<T> = Maybe<T | null>
@@ -121,9 +122,9 @@ const semigroupURLSearchParams: Semigroup<URLSearchParams> = {
   },
 }
 
-export const setURLSearchParams = <A extends Record<string, string>>(
-  url: string,
-) => (params: A): string => {
+export const setURLSearchParams = <K extends string>(url: string) => (
+  params: Record<K, string>,
+): string => {
   const u = new URL(url)
 
   const mergedParams = semigroupURLSearchParams.concat(
@@ -164,3 +165,16 @@ export const signURL = (secureUrlToken: Option<string>) => (
 
 export const join = <A>(separator?: string) => (arr: A[]): string =>
   arr.join(separator)
+
+export const taskEitherFromUrlResolver = <TSource>(
+  resolveUrl: ImgixResolveUrl<TSource>,
+) => (obj: TSource): TaskEither<Error, string> =>
+  TE.tryCatch(
+    () =>
+      Promise.resolve(resolveUrl(obj)).then((url) =>
+        typeof url === 'string'
+          ? url
+          : Promise.reject('Resolved URL is not a string.'),
+      ),
+    (reason) => new Error(String(reason)),
+  )

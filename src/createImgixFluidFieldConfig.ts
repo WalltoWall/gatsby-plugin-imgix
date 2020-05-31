@@ -10,7 +10,13 @@ import {
 } from 'gatsby/graphql'
 import { FluidObject } from 'gatsby-image'
 import { ComposeFieldConfigAsObject } from 'graphql-compose'
+import * as O from 'fp-ts/es6/Option'
+import * as T from 'fp-ts/es6/Task'
+import * as TE from 'fp-ts/es6/TaskEither'
+import { Task } from 'fp-ts/es6/Task'
+import { pipe } from 'fp-ts/es6/pipeable'
 
+import { ImgixFluidArgs, ImgixUrlParams } from './types'
 import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
 import { buildImgixFluid, DEFAULT_FLUID_MAX_WIDTH } from './builders'
 import {
@@ -18,8 +24,7 @@ import {
   ImgixUrlParamsInputType,
   fetchImgixMetadata,
 } from './shared'
-import { Maybe } from './utils'
-import { ImgixFluidArgs, ImgixUrlParams } from './types'
+import { taskEitherFromUrlResolver } from './utils'
 
 interface CreateImgixFluidTypeArgs {
   name: string
@@ -56,52 +61,63 @@ interface CreateImgixFluidFieldConfigArgs<TSource> {
 export const createImgixFluidFieldConfig = <TSource, TContext>({
   type,
   resolveUrl,
-  secureUrlToken,
+  secureUrlToken: rawSecureUrlToken,
   cache,
   defaultImgixParams,
 }: CreateImgixFluidFieldConfigArgs<TSource>): GraphQLFieldConfig<
   TSource,
   TContext,
   ImgixFluidArgs
-> => ({
-  type,
-  args: {
-    maxWidth: {
-      type: GraphQLInt,
-      defaultValue: DEFAULT_FLUID_MAX_WIDTH,
-    },
-    maxHeight: {
-      type: GraphQLInt,
-    },
-    srcSetBreakpoints: {
-      type: new GraphQLList(GraphQLInt),
-    },
-    imgixParams: {
-      type: ImgixUrlParamsInputType,
-      defaultValue: {},
-    },
-  },
-  resolve: async (obj, args): Promise<Maybe<FluidObject>> => {
-    const url = await resolveUrl(obj)
-    if (!url) return
+> => {
+  const secureUrlToken = O.fromNullable(rawSecureUrlToken)
 
-    const metadata = await fetchImgixMetadata({ url, cache, secureUrlToken })
-
-    return buildImgixFluid({
-      url,
-      sourceWidth: metadata.PixelWidth,
-      sourceHeight: metadata.PixelHeight,
-      secureUrlToken,
-      args: {
-        ...args,
-        imgixParams: {
-          ...defaultImgixParams,
-          ...args.imgixParams,
-        },
+  return {
+    type,
+    args: {
+      maxWidth: {
+        type: GraphQLInt,
+        defaultValue: DEFAULT_FLUID_MAX_WIDTH,
       },
-    })
-  },
-})
+      maxHeight: {
+        type: GraphQLInt,
+      },
+      srcSetBreakpoints: {
+        type: new GraphQLList(GraphQLInt),
+      },
+      imgixParams: {
+        type: ImgixUrlParamsInputType,
+        defaultValue: {},
+      },
+    },
+    resolve: (obj, args): Task<FluidObject | undefined> =>
+      pipe(
+        obj,
+        taskEitherFromUrlResolver(resolveUrl),
+        TE.chain((url) =>
+          pipe(
+            url,
+            fetchImgixMetadata(cache, secureUrlToken),
+            TE.map((metadata) =>
+              buildImgixFluid({
+                url,
+                sourceWidth: metadata.PixelWidth,
+                sourceHeight: metadata.PixelHeight,
+                secureUrlToken: rawSecureUrlToken,
+                args: {
+                  ...args,
+                  imgixParams: {
+                    ...defaultImgixParams,
+                    ...args.imgixParams,
+                  },
+                },
+              }),
+            ),
+          ),
+        ),
+        TE.fold(() => T.of(undefined), T.of),
+      ),
+  }
+}
 
 export const createImgixFluidSchemaFieldConfig = <TSource, TContext>(
   args: CreateImgixFluidFieldConfigArgs<TSource>,

@@ -1,5 +1,6 @@
 import { FixedObject, FluidObject } from 'gatsby-image'
 import * as A from 'fp-ts/es6/Array'
+import * as O from 'fp-ts/es6/Option'
 import * as R from 'fp-ts/es6/Record'
 import { Option } from 'fp-ts/es6/Option'
 import { eqNumber } from 'fp-ts/es6/Eq'
@@ -29,7 +30,14 @@ const DEFAULT_LQIP_PARAMS: ImgixUrlParams = { w: 100, blur: 15, q: 20 }
 export const buildImgixUrl = (url: string, secureUrlToken: Option<string>) => (
   params: ImgixUrlParams,
 ): string =>
-  pipe(params, R.map(String), setURLSearchParams(url), signURL(secureUrlToken))
+  pipe(
+    params,
+    R.filterMap((param) =>
+      typeof param === undefined ? O.none : O.some(String(param)),
+    ),
+    setURLSearchParams(url),
+    signURL(secureUrlToken),
+  )
 
 const buildImgixLqipUrl = (url: string, secureUrlToken: Option<string>) => (
   params: ImgixUrlParams,
@@ -72,9 +80,11 @@ export const buildImgixFixed = ({
   url,
   sourceWidth,
   sourceHeight,
-  secureUrlToken,
+  secureUrlToken: rawSecureUrlToken,
   args = {},
 }: BuildImgixFixedArgs): FixedObject => {
+  const secureUrlToken = O.fromNullable(rawSecureUrlToken)
+
   const aspectRatio = sourceWidth / sourceHeight
 
   let width: number
@@ -163,9 +173,11 @@ export const buildImgixFluid = ({
   url,
   sourceWidth,
   sourceHeight,
-  secureUrlToken,
+  secureUrlToken: rawSecureUrlToken,
   args = {},
 }: BuildImgixFluidArgs): FluidObject => {
+  const secureUrlToken = O.fromNullable(rawSecureUrlToken)
+
   const aspectRatio = sourceWidth / sourceHeight
   const maxWidth = args.maxWidth ?? DEFAULT_FLUID_MAX_WIDTH
 
