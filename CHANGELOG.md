@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.5.0...v0.6.0) (2020-05-31)
+
+
+### Features
+
+* begin converting builders ([17b4f8f](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/17b4f8f72cd2e1e4974ee8b47519666ba7e593c5))
+* cleanup rollup ([9d70701](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/9d70701e9988bb6706efda3b417de8e329d3a2f4))
+* convert remaining functions to fp-ts ([9413bc6](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/9413bc67bc2b49b4cba0d1e66c28417aec62c79d))
+* convert shared.ts ([1cdb94d](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/1cdb94da0ddfa92b15d15c1caa31cc2e1c544a0a))
+* initial fp-ts attempt ([52f962e](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/52f962ec1f9f721a4189dc45e370c78005e55c92))
+* move node-specific APIs to node.ts ([07b94da](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/07b94dad543722c3bf4919acee9683593e60e569))
+* restructure programmatic API ([e010c8c](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/e010c8c4d1f9f207f28adde4036aa66072f837b2))
+
+
+### Bug Fixes
+
+* ensure compat with real gatsby project ([d6c4365](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/d6c4365abf63a13f94177ebf432de1f31c78e50f))
+
 ## [0.5.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.4.2...v0.5.0) (2020-05-09)
 
 
