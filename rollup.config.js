@@ -2,7 +2,7 @@ import typescript from '@rollup/plugin-typescript'
 import json from '@rollup/plugin-json'
 import autoExternal from 'rollup-plugin-auto-external'
 
-const externalPkgs = ['gatsby/graphql']
+const externalPkgs = ['gatsby/graphql', /fp-ts\/.*/]
 
 export default [
   {

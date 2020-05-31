@@ -1,4 +1,4 @@
-import { Cache } from 'gatsby'
+import { GatsbyCache } from 'gatsby'
 import {
   GraphQLFieldConfig,
   GraphQLInt,
@@ -8,11 +8,10 @@ import {
 } from 'gatsby/graphql'
 import { FixedObject } from 'gatsby-image'
 import { ComposeFieldConfigAsObject } from 'graphql-compose'
-import * as O from 'fp-ts/es6/Option'
-import * as T from 'fp-ts/es6/Task'
-import * as TE from 'fp-ts/es6/TaskEither'
-import { Task } from 'fp-ts/es6/Task'
-import { pipe } from 'fp-ts/es6/pipeable'
+import * as O from 'fp-ts/lib/Option'
+import * as T from 'fp-ts/lib/Task'
+import * as TE from 'fp-ts/lib/TaskEither'
+import { pipe } from 'fp-ts/lib/pipeable'
 
 import { ImgixFixedArgs, ImgixUrlParams } from './types'
 import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
@@ -26,7 +25,7 @@ import { taskEitherFromUrlResolver } from './utils'
 
 interface CreateImgixFixedTypeArgs {
   name: string
-  cache: Cache['cache']
+  cache: GatsbyCache
   secureUrlToken?: string
 }
 
@@ -53,7 +52,7 @@ interface CreateImgixFixedFieldConfigArgs<TSource> {
   type: GraphQLObjectType<FixedObject>
   resolveUrl: ImgixResolveUrl<TSource>
   secureUrlToken?: string
-  cache: Cache['cache']
+  cache: GatsbyCache
   defaultImgixParams?: ImgixUrlParams
 }
 
@@ -85,7 +84,10 @@ export const createImgixFixedFieldConfig = <TSource, TContext>({
         defaultValue: {},
       },
     },
-    resolve: (obj, args): Task<FixedObject | undefined> =>
+    resolve: (
+      obj: TSource,
+      args: ImgixFixedArgs,
+    ): Promise<FixedObject | undefined> =>
       pipe(
         obj,
         taskEitherFromUrlResolver(resolveUrl),
@@ -111,7 +113,7 @@ export const createImgixFixedFieldConfig = <TSource, TContext>({
           ),
         ),
         TE.fold(() => T.of(undefined), T.of),
-      ),
+      )(),
   }
 }
 

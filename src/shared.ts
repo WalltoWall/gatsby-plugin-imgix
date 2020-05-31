@@ -1,4 +1,4 @@
-import { Cache } from 'gatsby'
+import { GatsbyCache } from 'gatsby'
 import {
   GraphQLInputObjectType,
   GraphQLInputFieldConfigMap,
@@ -9,10 +9,10 @@ import {
 } from 'gatsby/graphql'
 import imgixUrlParameters from 'imgix-url-params/dist/parameters.json'
 import { camelCase } from 'camel-case'
-import * as TE from 'fp-ts/es6/TaskEither'
-import { Option } from 'fp-ts/es6/Option'
-import { pipe } from 'fp-ts/es6/pipeable'
-import { sequenceS } from 'fp-ts/es6/Apply'
+import * as TE from 'fp-ts/lib/TaskEither'
+import { Option } from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import { sequenceS } from 'fp-ts/lib/Apply'
 
 import { ImgixMetadata } from './types'
 import { buildImgixUrl } from './builders'
@@ -94,7 +94,7 @@ export type ImgixResolveUrl<TSource> = (
 ) => OptionalPromise<Nullable<string>>
 
 export const fetchImgixMetadata = (
-  cache: Cache['cache'],
+  cache: GatsbyCache,
   secureUrlToken: Option<string>,
 ) => (url: string): TE.TaskEither<Error, ImgixMetadata> =>
   getFromCacheOr(`gatsby-plugin-imgix-metadata-${url}`, cache, () =>
@@ -104,7 +104,7 @@ export const fetchImgixMetadata = (
   )
 
 export const fetchImgixBase64Url = (
-  cache: Cache['cache'],
+  cache: GatsbyCache,
   secureUrlToken: Option<string>,
 ) => (url: string): TE.TaskEither<Error, string> =>
   getFromCacheOr(`gatsby-plugin-imgix-base64-url-${url}`, cache, () =>

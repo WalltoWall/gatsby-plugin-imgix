@@ -1,4 +1,4 @@
-import { Cache } from 'gatsby'
+import { GatsbyCache } from 'gatsby'
 import {
   GraphQLFieldConfig,
   GraphQLFloat,
@@ -10,11 +10,10 @@ import {
 } from 'gatsby/graphql'
 import { FluidObject } from 'gatsby-image'
 import { ComposeFieldConfigAsObject } from 'graphql-compose'
-import * as O from 'fp-ts/es6/Option'
-import * as T from 'fp-ts/es6/Task'
-import * as TE from 'fp-ts/es6/TaskEither'
-import { Task } from 'fp-ts/es6/Task'
-import { pipe } from 'fp-ts/es6/pipeable'
+import * as O from 'fp-ts/lib/Option'
+import * as T from 'fp-ts/lib/Task'
+import * as TE from 'fp-ts/lib/TaskEither'
+import { pipe } from 'fp-ts/lib/pipeable'
 
 import { ImgixFluidArgs, ImgixUrlParams } from './types'
 import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
@@ -28,7 +27,7 @@ import { taskEitherFromUrlResolver } from './utils'
 
 interface CreateImgixFluidTypeArgs {
   name: string
-  cache: Cache['cache']
+  cache: GatsbyCache
   secureUrlToken?: string
 }
 
@@ -54,7 +53,7 @@ interface CreateImgixFluidFieldConfigArgs<TSource> {
   type: GraphQLObjectType<FluidObject>
   resolveUrl: ImgixResolveUrl<TSource>
   secureUrlToken?: string
-  cache: Cache['cache']
+  cache: GatsbyCache
   defaultImgixParams?: ImgixUrlParams
 }
 
@@ -89,7 +88,10 @@ export const createImgixFluidFieldConfig = <TSource, TContext>({
         defaultValue: {},
       },
     },
-    resolve: (obj, args): Task<FluidObject | undefined> =>
+    resolve: (
+      obj: TSource,
+      args: ImgixFluidArgs,
+    ): Promise<FluidObject | undefined> =>
       pipe(
         obj,
         taskEitherFromUrlResolver(resolveUrl),
@@ -115,7 +117,7 @@ export const createImgixFluidFieldConfig = <TSource, TContext>({
           ),
         ),
         TE.fold(() => T.of(undefined), T.of),
-      ),
+      )(),
   }
 }
 

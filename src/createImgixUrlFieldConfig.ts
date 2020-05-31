@@ -1,10 +1,9 @@
 import { GraphQLFieldConfig, GraphQLString } from 'gatsby/graphql'
 import { ComposeFieldConfigAsObject } from 'graphql-compose'
-import * as O from 'fp-ts/es6/Option'
-import * as T from 'fp-ts/es6/Task'
-import * as TE from 'fp-ts/es6/TaskEither'
-import { Task } from 'fp-ts/es6/Task'
-import { pipe } from 'fp-ts/es6/pipeable'
+import * as O from 'fp-ts/lib/Option'
+import * as T from 'fp-ts/lib/Task'
+import * as TE from 'fp-ts/lib/TaskEither'
+import { pipe } from 'fp-ts/lib/pipeable'
 
 import { buildImgixUrl } from './builders'
 import { ImgixResolveUrl, ImgixUrlParamsInputType } from './shared'
@@ -40,7 +39,7 @@ export const createImgixUrlFieldConfig = <TSource, TContext>({
         defaultValue: {},
       },
     },
-    resolve: (obj, args): Task<string | undefined> =>
+    resolve: (obj: TSource, args: ImgixUrlArgs): Promise<string | undefined> =>
       pipe(
         obj,
         taskEitherFromUrlResolver(resolveUrl),
@@ -54,7 +53,7 @@ export const createImgixUrlFieldConfig = <TSource, TContext>({
           ),
         ),
         TE.fold(() => T.of(undefined), T.of),
-      ),
+      )(),
   }
 }
 
