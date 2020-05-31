@@ -150,7 +150,7 @@ const buildImgixFluidSrcSet = (
           h: Math.round(breakpoint / aspectRatio),
         }),
         buildImgixUrl(baseUrl, secureUrlToken),
-        (url) => `${url} ${Math.round(breakpoint)}`,
+        (url) => `${url} ${Math.round(breakpoint)}w`,
       ),
     ),
     join(', '),
