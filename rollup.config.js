@@ -1,8 +1,9 @@
 import typescript from '@rollup/plugin-typescript'
 import json from '@rollup/plugin-json'
 import autoExternal from 'rollup-plugin-auto-external'
+import { terser } from 'rollup-plugin-terser'
 
-const externalPkgs = ['gatsby/graphql', /fp-ts\/.*/]
+const externalPkgs = ['gatsby/graphql', /^fp-ts\//]
 
 export default [
   {
@@ -22,13 +23,14 @@ export default [
       }),
       json(),
       autoExternal(),
+      terser(),
     ],
   },
   {
     input: 'src/index.ts',
     output: { file: 'lib/index.esm.js', format: 'es', sourcemap: true },
     external: externalPkgs,
-    plugins: [typescript(), json(), autoExternal()],
+    plugins: [typescript(), json(), autoExternal(), terser()],
   },
   {
     input: 'src/node.ts',

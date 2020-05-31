@@ -5,10 +5,10 @@ import {
   GraphQLFieldConfig,
 } from 'gatsby/graphql'
 import { FixedObject, FluidObject } from 'gatsby-image'
-import * as O from 'fp-ts/lib/Option'
-import * as T from 'fp-ts/lib/Task'
-import * as TE from 'fp-ts/lib/TaskEither'
-import { pipe } from 'fp-ts/lib/pipeable'
+import * as O from 'fp-ts/es6/Option'
+import * as T from 'fp-ts/es6/Task'
+import * as TE from 'fp-ts/es6/TaskEither'
+import { pipe } from 'fp-ts/es6/pipeable'
 
 import { fetchImgixBase64Url, ImgixResolveUrl } from './shared'
 import { taskEitherFromUrlResolver } from './utils'

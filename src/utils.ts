@@ -1,14 +1,14 @@
 import _fetch, { Response } from 'node-fetch'
 import { GatsbyCache, Reporter } from 'gatsby'
-import { createHash, BinaryLike } from 'crypto'
-import * as O from 'fp-ts/lib/Option'
-import * as TE from 'fp-ts/lib/TaskEither'
-import { Option } from 'fp-ts/lib/Option'
-import { Semigroup, getObjectSemigroup } from 'fp-ts/lib/Semigroup'
-import { Task } from 'fp-ts/lib/Task'
-import { TaskEither } from 'fp-ts/lib/TaskEither'
-import { flow } from 'fp-ts/lib/function'
-import { pipe } from 'fp-ts/lib/pipeable'
+import md5 from 'md5'
+import * as O from 'fp-ts/es6/Option'
+import * as TE from 'fp-ts/es6/TaskEither'
+import { Option } from 'fp-ts/es6/Option'
+import { Semigroup, getObjectSemigroup } from 'fp-ts/es6/Semigroup'
+import { Task } from 'fp-ts/es6/Task'
+import { TaskEither } from 'fp-ts/es6/TaskEither'
+import { flow } from 'fp-ts/es6/function'
+import { pipe } from 'fp-ts/es6/pipeable'
 
 import { ImgixUrlParams } from './types'
 import { ImgixResolveUrl } from './shared'
@@ -135,9 +135,6 @@ export const setURLSearchParams = <K extends string>(url: string) => (
 
   return u.toString()
 }
-
-export const md5 = (input: BinaryLike): string =>
-  createHash('md5').update(input).digest('hex')
 
 export const createURLSignature = (secureUrlToken: string) => (
   url: string,

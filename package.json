@@ -12,6 +12,7 @@
     "gatsby-node.js",
     "fragments.js"
   ],
+  "sideEffects": false,
   "engines": {
     "node": ">=10"
   },
@@ -40,6 +41,7 @@
     "camel-case": "^4.1.1",
     "fp-ts": "^2.6.2",
     "imgix-url-params": "^11.4.3",
+    "md5": "^2.2.1",
     "node-fetch": "^2.6.0",
     "param-case": "^3.0.3"
   },
@@ -52,6 +54,7 @@
     "@rollup/plugin-json": "^4.0.3",
     "@rollup/plugin-typescript": "^4.1.2",
     "@types/isomorphic-fetch": "^0.0.35",
+    "@types/md5": "^2.2.0",
     "@types/node-fetch": "^2.5.7",
     "@typescript-eslint/eslint-plugin": "^3.0.2",
     "@typescript-eslint/parser": "^3.0.2",
@@ -63,8 +66,8 @@
     "rimraf": "^3.0.2",
     "rollup": "^2.11.2",
     "rollup-plugin-auto-external": "^2.0.0",
+    "rollup-plugin-terser": "^6.1.0",
     "standard-version": "^8.0.0",
-    "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
     "typescript": "^3.9.3"
   },
