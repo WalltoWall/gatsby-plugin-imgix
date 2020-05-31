@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.1](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.7.0...v0.7.1) (2020-05-31)
+
+
+### Bug Fixes
+
+* ensure placeholder images use same params as full-size image ([9c2436b](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/9c2436be2dad091e4e2eeb97e1bcac2b0f39b426))
+
 ## [0.7.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.6.1...v0.7.0) (2020-05-31)
 
 
