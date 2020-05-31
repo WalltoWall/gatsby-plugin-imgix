@@ -20,6 +20,7 @@
     "clean": "rimraf ./dist",
     "start": "yarn clean && microbundle watch src/index.ts src/node.ts src/gatsby-node.ts -o dist -f modern,cjs",
     "build": "yarn clean && microbundle build src/index.ts src/node.ts src/gatsby-node.ts -o dist -f modern,cjs",
+    "format": "prettier --write '{src,docs}/**/*.{ts,tsx,md}'",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
     "prepare": "yarn build",
