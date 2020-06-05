@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.8.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.7.1...v0.8.0) (2020-06-05)
+
+
+### Features
+
+* provide source dimensions if available ([#6](https://github.com/WalltoWall/gatsby-plugin-imgix/issues/6)) ([45bbfd9](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/45bbfd90f0b51436cc789715354dca1c3d24870a))
+
 ### [0.7.1](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.7.0...v0.7.1) (2020-05-31)
 
 
