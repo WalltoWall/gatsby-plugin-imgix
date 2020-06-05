@@ -2,7 +2,6 @@ import { FixedObject, FluidObject } from 'gatsby-image'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import * as R from 'fp-ts/lib/Record'
-import { Option } from 'fp-ts/lib/Option'
 import { eqNumber } from 'fp-ts/lib/Eq'
 import { ordNumber } from 'fp-ts/lib/Ord'
 import { pipe } from 'fp-ts/lib/pipeable'
@@ -27,7 +26,7 @@ const FLUID_BREAKPOINT_FACTORS = [0.25, 0.5, 1.5, 2]
 // Default params for placeholder images.
 const DEFAULT_LQIP_PARAMS: ImgixUrlParams = { w: 100, blur: 15, q: 20 }
 
-export const buildImgixUrl = (url: string, secureUrlToken: Option<string>) => (
+export const buildImgixUrl = (url: string, secureUrlToken?: string) => (
   params: ImgixUrlParams,
 ): string =>
   pipe(
@@ -38,10 +37,10 @@ export const buildImgixUrl = (url: string, secureUrlToken: Option<string>) => (
       param === undefined ? O.some(undefined) : O.some(String(param)),
     ),
     setURLSearchParams(url),
-    signURL(secureUrlToken),
+    signURL(O.fromNullable(secureUrlToken)),
   )
 
-const buildImgixLqipUrl = (url: string, secureUrlToken: Option<string>) => (
+const buildImgixLqipUrl = (url: string, secureUrlToken?: string) => (
   params: ImgixUrlParams,
 ): string =>
   pipe(
@@ -49,10 +48,9 @@ const buildImgixLqipUrl = (url: string, secureUrlToken: Option<string>) => (
     buildImgixUrl(url, secureUrlToken),
   )
 
-const buildImgixFixedSrcSet = (
-  baseUrl: string,
-  secureUrlToken: Option<string>,
-) => (params: ImgixUrlParams): string =>
+const buildImgixFixedSrcSet = (baseUrl: string, secureUrlToken?: string) => (
+  params: ImgixUrlParams,
+): string =>
   pipe(
     FIXED_RESOLUTIONS,
     A.map((dpr) =>
@@ -82,11 +80,9 @@ export const buildImgixFixed = ({
   url,
   sourceWidth,
   sourceHeight,
-  secureUrlToken: rawSecureUrlToken,
+  secureUrlToken,
   args = {},
 }: BuildImgixFixedArgs): FixedObject => {
-  const secureUrlToken = O.fromNullable(rawSecureUrlToken)
-
   const aspectRatio = sourceWidth / sourceHeight
 
   let width: number
@@ -149,10 +145,9 @@ type BuildFluidSrcSetArgs = {
   srcSetBreakpoints?: number[]
 }
 
-const buildImgixFluidSrcSet = (
-  baseUrl: string,
-  secureUrlToken: Option<string>,
-) => (params: ImgixUrlParams) => ({
+const buildImgixFluidSrcSet = (baseUrl: string, secureUrlToken?: string) => (
+  params: ImgixUrlParams,
+) => ({
   aspectRatio,
   maxWidth,
   srcSetBreakpoints = FLUID_BREAKPOINT_FACTORS.map((x) => maxWidth * x),
@@ -191,11 +186,9 @@ export const buildImgixFluid = ({
   url,
   sourceWidth,
   sourceHeight,
-  secureUrlToken: rawSecureUrlToken,
+  secureUrlToken,
   args = {},
 }: BuildImgixFluidArgs): FluidObject => {
-  const secureUrlToken = O.fromNullable(rawSecureUrlToken)
-
   const aspectRatio = sourceWidth / sourceHeight
   const maxWidth = args.maxWidth ?? DEFAULT_FLUID_MAX_WIDTH
 

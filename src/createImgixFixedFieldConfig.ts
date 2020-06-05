@@ -8,7 +8,6 @@ import {
 } from 'gatsby/graphql'
 import { FixedObject } from 'gatsby-image'
 import { ComposeFieldConfigAsObject } from 'graphql-compose'
-import * as O from 'fp-ts/lib/Option'
 import * as T from 'fp-ts/lib/Task'
 import * as TE from 'fp-ts/lib/TaskEither'
 import { pipe } from 'fp-ts/lib/pipeable'
@@ -17,27 +16,25 @@ import { ImgixFixedArgs, ImgixUrlParams } from './types'
 import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
 import { buildImgixFixed, DEFAULT_FIXED_WIDTH } from './builders'
 import {
-  ImgixResolveUrl,
+  ImgixSourceDataResolver,
   ImgixUrlParamsInputType,
-  fetchImgixMetadata,
+  resolveDimensions,
 } from './shared'
-import { taskEitherFromUrlResolver } from './utils'
+import { taskEitherFromSourceDataResolver, noop } from './utils'
 
 interface CreateImgixFixedTypeArgs {
   name: string
   cache: GatsbyCache
-  secureUrlToken?: string
 }
 
 export const createImgixFixedType = ({
   name,
   cache,
-  secureUrlToken,
 }: CreateImgixFixedTypeArgs): GraphQLObjectType<FixedObject> =>
   new GraphQLObjectType({
     name,
     fields: {
-      base64: createImgixBase64UrlFieldConfig({ cache, secureUrlToken }),
+      base64: createImgixBase64UrlFieldConfig({ cache }),
       src: { type: new GraphQLNonNull(GraphQLString) },
       srcSet: { type: new GraphQLNonNull(GraphQLString) },
       srcWebp: { type: new GraphQLNonNull(GraphQLString) },
@@ -50,7 +47,9 @@ export const createImgixFixedType = ({
 
 interface CreateImgixFixedFieldConfigArgs<TSource> {
   type: GraphQLObjectType<FixedObject>
-  resolveUrl: ImgixResolveUrl<TSource>
+  resolveUrl: ImgixSourceDataResolver<TSource, string>
+  resolveWidth?: ImgixSourceDataResolver<TSource, number>
+  resolveHeight?: ImgixSourceDataResolver<TSource, number>
   secureUrlToken?: string
   cache: GatsbyCache
   defaultImgixParams?: ImgixUrlParams
@@ -60,7 +59,9 @@ interface CreateImgixFixedFieldConfigArgs<TSource> {
 export const createImgixFixedFieldConfig = <TSource, TContext>({
   type,
   resolveUrl,
-  secureUrlToken: rawSecureUrlToken,
+  resolveWidth = noop,
+  resolveHeight = noop,
+  secureUrlToken,
   cache,
   defaultImgixParams,
   defaultPlaceholderImgixParams,
@@ -68,64 +69,69 @@ export const createImgixFixedFieldConfig = <TSource, TContext>({
   TSource,
   TContext,
   ImgixFixedArgs
-> => {
-  const secureUrlToken = O.fromNullable(rawSecureUrlToken)
-
-  return {
-    type,
-    args: {
-      width: {
-        type: GraphQLInt,
-        defaultValue: DEFAULT_FIXED_WIDTH,
-      },
-      height: {
-        type: GraphQLInt,
-      },
-      imgixParams: {
-        type: ImgixUrlParamsInputType,
-        defaultValue: {},
-      },
-      placeholderImgixParams: {
-        type: ImgixUrlParamsInputType,
-        defaultValue: {},
-      },
+> => ({
+  type,
+  args: {
+    width: {
+      type: GraphQLInt,
+      defaultValue: DEFAULT_FIXED_WIDTH,
     },
-    resolve: (
-      obj: TSource,
-      args: ImgixFixedArgs,
-    ): Promise<FixedObject | undefined> =>
-      pipe(
-        obj,
-        taskEitherFromUrlResolver(resolveUrl),
-        TE.chain((url) =>
-          pipe(
-            url,
-            fetchImgixMetadata(cache, secureUrlToken),
-            TE.map((metadata) =>
-              buildImgixFixed({
-                url,
-                sourceWidth: metadata.PixelWidth,
-                sourceHeight: metadata.PixelHeight,
-                secureUrlToken: rawSecureUrlToken,
-                args: {
-                  ...args,
-                  imgixParams: {
-                    ...defaultImgixParams,
-                    ...args.imgixParams,
-                  },
-                  placeholderImgixParams: {
-                    ...defaultPlaceholderImgixParams,
-                    ...args.placeholderImgixParams,
-                  },
+    height: {
+      type: GraphQLInt,
+    },
+    imgixParams: {
+      type: ImgixUrlParamsInputType,
+      defaultValue: {},
+    },
+    placeholderImgixParams: {
+      type: ImgixUrlParamsInputType,
+      defaultValue: {},
+    },
+  },
+  resolve: (
+    obj: TSource,
+    args: ImgixFixedArgs,
+  ): Promise<FixedObject | undefined> =>
+    pipe(
+      obj,
+      taskEitherFromSourceDataResolver(
+        resolveUrl,
+        (url) => typeof url === 'string',
+      ),
+      TE.chain((url) =>
+        pipe(
+          url,
+          resolveDimensions(
+            obj,
+            resolveWidth,
+            resolveHeight,
+            cache,
+            secureUrlToken,
+          ),
+          TE.map(([width, height]) =>
+            buildImgixFixed({
+              url,
+              sourceWidth: width,
+              sourceHeight: height,
+              secureUrlToken,
+              args: {
+                ...args,
+                imgixParams: {
+                  ...defaultImgixParams,
+                  ...args.imgixParams,
                 },
-              }),
-            ),
+                placeholderImgixParams: {
+                  ...defaultPlaceholderImgixParams,
+                  ...args.placeholderImgixParams,
+                },
+              },
+            }),
           ),
         ),
-        TE.fold(() => T.of(undefined), T.of),
-      )(),
-  }
-}
+      ),
+      TE.getOrElseW(() => T.of(undefined)),
+    )(),
+})
 
 export const createImgixFixedSchemaFieldConfig = <TSource, TContext>(
   args: CreateImgixFixedFieldConfigArgs<TSource>,
