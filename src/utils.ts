@@ -13,7 +13,7 @@ import { flow } from 'fp-ts/lib/function'
 import { pipe } from 'fp-ts/lib/pipeable'
 
 import { ImgixUrlParams } from './types'
-import { ImgixResolveUrl } from './shared'
+import { ImgixSourceDataResolver } from './shared'
 
 export type Maybe<T> = T | undefined
 export type Nullable<T> = Maybe<T | null>
@@ -25,6 +25,10 @@ export function invariant(
   reporter: Reporter,
 ): asserts condition {
   if (!condition) reporter.panic(`Invariant failed: ${msg}`)
+}
+
+export const noop = (): void => {
+  // noop
 }
 
 export const transformUrlForWebProxy = (
@@ -183,15 +187,21 @@ export const signURL = (secureUrlToken: Option<string>) => (
 export const join = <A>(separator?: string) => (arr: A[]): string =>
   arr.join(separator)
 
-export const taskEitherFromUrlResolver = <TSource>(
-  resolveUrl: ImgixResolveUrl<TSource>,
-) => (obj: TSource): TaskEither<Error, string> =>
+export const taskEitherFromSourceDataResolver = <TSource, TData>(
+  resolver: ImgixSourceDataResolver<TSource, TData>,
+  predicate?: (data: TData | null) => boolean,
+) => (source: TSource): TaskEither<Error, TData> =>
   TE.tryCatch(
     () =>
-      Promise.resolve(resolveUrl(obj)).then((url) =>
-        typeof url === 'string'
-          ? url
-          : Promise.reject('Resolved URL is not a string.'),
-      ),
+      Promise.resolve(resolver(source)).then((data) => {
+        if (data === undefined || data === null)
+          return Promise.reject('Resolved data is null or undefined')
+
+        if (!predicate) return data
+
+        return predicate(data)
+          ? data
+          : Promise.reject('Resolved data is invalid.')
+      }),
     (reason) => new Error(String(reason)),
   )

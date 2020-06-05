@@ -9,19 +9,20 @@ import {
 } from 'gatsby/graphql'
 import imgixUrlParameters from 'imgix-url-params/dist/parameters.json'
 import { camelCase } from 'camel-case'
+// import * as E from 'fp-ts/lib/Either'
 import * as TE from 'fp-ts/lib/TaskEither'
-import { Option } from 'fp-ts/lib/Option'
+// import { Either } from 'fp-ts/lib/Either'
+import { TaskEither } from 'fp-ts/lib/TaskEither'
 import { pipe } from 'fp-ts/lib/pipeable'
-import { sequenceS } from 'fp-ts/lib/Apply'
+import { sequenceT } from 'fp-ts/lib/Apply'
 
 import { ImgixMetadata } from './types'
 import { buildImgixUrl } from './builders'
 import {
-  Nullable,
-  OptionalPromise,
   getFromCacheOr,
-  fetchBase64,
   fetchJSON,
+  taskEitherFromSourceDataResolver,
+  fetch,
   buildBase64URL,
 } from './utils'
 
@@ -89,13 +90,13 @@ export const ImgixUrlParamsInputType = new GraphQLInputObjectType({
   }, {} as GraphQLInputFieldConfigMap),
 })
 
-export type ImgixResolveUrl<TSource> = (
+export type ImgixSourceDataResolver<TSource, TData> = (
   obj: TSource,
-) => OptionalPromise<Nullable<string>>
+) => TData | null | undefined | void | Promise<TData | null | undefined | void>
 
 export const fetchImgixMetadata = (
   cache: GatsbyCache,
-  secureUrlToken: Option<string>,
+  secureUrlToken?: string,
 ) => (url: string): TE.TaskEither<Error, ImgixMetadata> =>
   getFromCacheOr(`gatsby-plugin-imgix-metadata-${url}`, cache, () =>
     pipe({ fm: 'json' }, buildImgixUrl(url, secureUrlToken), (u) =>
@@ -103,19 +104,59 @@ export const fetchImgixMetadata = (
     ),
   )
 
-export const fetchImgixBase64Url = (
-  cache: GatsbyCache,
-  secureUrlToken: Option<string>,
-) => (url: string): TE.TaskEither<Error, string> =>
+export const fetchImgixBase64Url = (cache: GatsbyCache) => (
+  url: string,
+): TE.TaskEither<Error, string> =>
   getFromCacheOr(`gatsby-plugin-imgix-base64-url-${url}`, cache, () =>
     pipe(
-      {
-        metadata: fetchImgixMetadata(cache, secureUrlToken)(url),
-        base64: fetchBase64(url),
-      },
-      sequenceS(TE.taskEither),
-      TE.map(({ metadata, base64 }) =>
-        buildBase64URL(metadata['Content-Type'], base64),
+      url,
+      fetch,
+      TE.chain((res) =>
+        pipe(
+          TE.rightTask<Error, Buffer>(() => res.buffer()),
+          TE.chain((buffer) => TE.right(buffer.toString('base64'))),
+          TE.chain((base64) =>
+            TE.right(
+              buildBase64URL(String(res.headers.get('content-type')), base64),
+            ),
+          ),
+        ),
       ),
     ),
   )
+
+const sequenceTTE = sequenceT(TE.taskEither)
+
+export const resolveDimensions = <TSource>(
+  source: TSource,
+  resolveWidth: ImgixSourceDataResolver<TSource, number>,
+  resolveHeight: ImgixSourceDataResolver<TSource, number>,
+  cache: GatsbyCache,
+  secureUrlToken?: string,
+) => (url: string): TaskEither<Error, [number, number]> =>
+  pipe(
+    sequenceTTE(
+      taskEitherFromSourceDataResolver(resolveWidth)(source),
+      taskEitherFromSourceDataResolver(resolveHeight)(source),
+    ),
+    TE.fold(
+      () =>
+        pipe(
+          url,
+          fetchImgixMetadata(cache, secureUrlToken),
+          TE.map(
+            ({ PixelWidth, PixelHeight }) =>
+              [PixelWidth, PixelHeight] as [number, number],
+          ),
+        ),
+      TE.right,
+    ),
+  )
+
+// export const aspectRatio = (
+//   width: number,
+//   height: number,
+// ): Either<Error, number> =>
+//   height === 0
+//     ? E.left(new Error('Height cannot be 0'))
+//     : E.right(width / height)
