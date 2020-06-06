@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.1](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.8.0...v0.8.1) (2020-06-06)
+
+
+### Bug Fixes
+
+* compile nullish coalescing operator and optional chaining ([38d6dfd](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/38d6dfdb2f1b2882982c1124db4b20c5cd554b91))
+
 ## [0.8.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.7.1...v0.8.0) (2020-06-05)
 
 
