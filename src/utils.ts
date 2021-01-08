@@ -163,7 +163,11 @@ export const setURLSearchParams = <K extends string>(url: string) => (
 export const createURLSignature = (secureUrlToken: string) => (
   url: string,
 ): string =>
-  pipe(new URL(url), (u) => secureUrlToken + u.pathname + u.search, md5)
+  pipe(
+    new URL(url),
+    (u) => secureUrlToken + u.pathname + u.search,
+    (s) => md5(s) as string,
+  )
 
 export const buildBase64URL = (contentType: string, base64: string): string =>
   `data:${contentType};base64,${base64}`
