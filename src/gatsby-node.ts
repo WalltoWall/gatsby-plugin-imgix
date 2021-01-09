@@ -66,7 +66,9 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = async (
   const fieldOptions = fields.filter(
     (fieldOptions) => fieldOptions.nodeType === node.internal.type,
   )
-  if (fieldOptions.length < 1) return
+  if (fieldOptions.length < 1) {
+    return
+  }
 
   for (const field of fieldOptions) {
     let fieldValue = undefined as string | string[] | undefined
@@ -89,7 +91,9 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = async (
       )
     }
 
-    if (!fieldValue) continue
+    if (!fieldValue) {
+      continue
+    }
 
     if (sourceType === ImgixSourceType.WebProxy) {
       invariant(
@@ -103,11 +107,13 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = async (
         reporter,
       )
 
-      if (Array.isArray(fieldValue))
+      if (Array.isArray(fieldValue)) {
         fieldValue = fieldValue.map((url) =>
           transformUrlForWebProxy(url, domain),
         )
-      else fieldValue = transformUrlForWebProxy(fieldValue, domain)
+      } else {
+        fieldValue = transformUrlForWebProxy(fieldValue, domain)
+      }
     }
 
     createNodeField({ node, name: field.fieldName, value: fieldValue })
