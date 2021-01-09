@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.9.0-schema.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.8.2...v0.9.0-schema.0) (2021-01-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* Types created using `graphql-js` are no longer
+supported due to complexities in duplicate/overlapping type with the
+same names.
+
+Use Gatsby's `schema` helpers to create types using the Imgix field
+config creators.
+
+Alternatively, use the new `createImgixTypes` function to build all
+necessary types with default values.
+
+### Features
+
+* convert type builders to Gatsby's schema helpers ([05f841c](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/05f841c36a2d6b3e6193f948cacdb6cdf904d27e))
+* update plugin usage with new schema-based builders ([0fad2af](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/0fad2afecbb70dced7eef0dea8352a3833a50a83))
+
 ### [0.8.2](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.8.1...v0.8.2) (2020-08-06)
 
 ### [0.8.1](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.8.0...v0.8.1) (2020-06-06)
