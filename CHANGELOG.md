@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.9.0-schema.1](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.9.0-schema.0...v0.9.0-schema.1) (2021-01-09)
+
+
+### Features
+
+* add fluid and fixed interfaces ([7660c8f](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/7660c8f7992839ef761b6c949b12a436693a0d00))
+* add node entry ([df34466](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/df34466924cb012da3123a7b49f18aaa81f077bc))
+
 ## [0.9.0-schema.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.8.2...v0.9.0-schema.0) (2021-01-09)
 
 
