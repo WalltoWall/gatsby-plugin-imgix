@@ -1,10 +1,11 @@
 import * as gatsby from 'gatsby'
 
+import { FLUID_INTERFACE_NAME } from './createImgixFluidInterface'
 import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
 
 export const DEFAULT_FLUID_TYPE_NAME = 'ImgixFluidImage'
 
-interface CreateImgixFluidTypeArgs {
+export interface CreateImgixFluidTypeArgs {
   /** Name for the type (default: `ImgixFluidImage`). */
   name?: string
   /** Gatsby cache from a Gatsby Node API. */
@@ -36,4 +37,5 @@ export const createImgixFluidType = (
       sizes: { type: 'String!' },
       aspectRatio: { type: 'Float!' },
     },
+    interfaces: [FLUID_INTERFACE_NAME],
   })

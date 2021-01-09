@@ -12,7 +12,7 @@ import { buildImgixFixed, DEFAULT_FIXED_WIDTH } from './builders'
 import { ImgixSourceDataResolver, resolveDimensions } from './shared'
 import { taskEitherFromSourceDataResolver, noop } from './utils'
 
-interface CreateImgixFixedFieldConfigArgs<TSource> {
+export interface CreateImgixFixedFieldConfigArgs<TSource> {
   type?: string
   paramsInputType?: string
   resolveUrl: ImgixSourceDataResolver<TSource, string>

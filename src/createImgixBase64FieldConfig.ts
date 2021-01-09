@@ -8,7 +8,7 @@ import { pipe } from 'fp-ts/lib/pipeable'
 import { fetchImgixBase64Url, ImgixSourceDataResolver } from './shared'
 import { taskEitherFromSourceDataResolver } from './utils'
 
-interface CreateImgixBase64UrlFieldConfigArgs {
+export interface CreateImgixBase64UrlFieldConfigArgs {
   /** Function mapping the source object to the URL to resolve to a Base64 URL. */
   resolveUrl?: ImgixSourceDataResolver<FixedObject | FluidObject, string>
   /** Gatsby cache from a Gatsby Node API. */

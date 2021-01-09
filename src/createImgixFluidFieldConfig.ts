@@ -12,7 +12,7 @@ import { buildImgixFluid, DEFAULT_FLUID_MAX_WIDTH } from './builders'
 import { ImgixSourceDataResolver, resolveDimensions } from './shared'
 import { taskEitherFromSourceDataResolver, noop } from './utils'
 
-interface CreateImgixFluidFieldConfigArgs<TSource> {
+export interface CreateImgixFluidFieldConfigArgs<TSource> {
   type?: string
   paramsInputType?: string
   resolveUrl: ImgixSourceDataResolver<TSource, string>
