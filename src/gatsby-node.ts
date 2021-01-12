@@ -7,15 +7,12 @@ import {
   PluginOptions as GatsbyPluginOptions,
 } from 'gatsby'
 
-import { createImgixUrlSchemaFieldConfig } from './createImgixUrlFieldConfig'
 import {
-  createImgixFixedSchemaFieldConfig,
-  createImgixFixedType,
-} from './createImgixFixedFieldConfig'
-import {
-  createImgixFluidSchemaFieldConfig,
-  createImgixFluidType,
-} from './createImgixFluidFieldConfig'
+  createImgixTypes,
+  createImgixUrlFieldConfig,
+  createImgixFixedFieldConfig,
+  createImgixFluidFieldConfig,
+} from './node'
 import { invariant, transformUrlForWebProxy, ns } from './utils'
 import { ImgixUrlParams } from './types'
 
@@ -69,7 +66,9 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = async (
   const fieldOptions = fields.filter(
     (fieldOptions) => fieldOptions.nodeType === node.internal.type,
   )
-  if (fieldOptions.length < 1) return
+  if (fieldOptions.length < 1) {
+    return
+  }
 
   for (const field of fieldOptions) {
     let fieldValue = undefined as string | string[] | undefined
@@ -92,7 +91,9 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = async (
       )
     }
 
-    if (!fieldValue) continue
+    if (!fieldValue) {
+      continue
+    }
 
     if (sourceType === ImgixSourceType.WebProxy) {
       invariant(
@@ -106,11 +107,13 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = async (
         reporter,
       )
 
-      if (Array.isArray(fieldValue))
+      if (Array.isArray(fieldValue)) {
         fieldValue = fieldValue.map((url) =>
           transformUrlForWebProxy(url, domain),
         )
-      else fieldValue = transformUrlForWebProxy(fieldValue, domain)
+      } else {
+        fieldValue = transformUrlForWebProxy(fieldValue, domain)
+      }
     }
 
     createNodeField({ node, name: field.fieldName, value: fieldValue })
@@ -143,34 +146,39 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
     reporter,
   )
 
-  const ImgixFixedType = createImgixFixedType({
-    name: ns(namespace, 'ImgixFixed'),
-    cache,
-  })
+  const fixedTypeName = ns(namespace, 'ImgixFixed')
+  const fluidTypeName = ns(namespace, 'ImgixFluid')
+  const paramsInputTypeName = ns(namespace, 'ImgixUrlParamsInput')
 
-  const ImgixFluidType = createImgixFluidType({
-    name: ns(namespace, 'ImgixFluid'),
+  const imgixTypes = createImgixTypes({
+    fixedTypeName,
+    fluidTypeName,
+    paramsInputTypeName,
     cache,
+    schema,
   })
 
   const ImgixImageType = schema.buildObjectType({
     name: ns(namespace, 'ImgixImage'),
     fields: {
-      url: createImgixUrlSchemaFieldConfig({
+      url: createImgixUrlFieldConfig({
+        paramsInputType: paramsInputTypeName,
         resolveUrl: (url: string) => url,
         secureUrlToken,
         defaultImgixParams,
       }),
-      fixed: createImgixFixedSchemaFieldConfig({
-        type: ImgixFixedType,
+      fixed: createImgixFixedFieldConfig({
+        type: fixedTypeName,
+        paramsInputType: paramsInputTypeName,
         resolveUrl: (url: string) => url,
         secureUrlToken,
         defaultImgixParams,
         defaultPlaceholderImgixParams,
         cache,
       }),
-      fluid: createImgixFluidSchemaFieldConfig({
-        type: ImgixFluidType,
+      fluid: createImgixFluidFieldConfig({
+        type: fluidTypeName,
+        paramsInputType: paramsInputTypeName,
         resolveUrl: (url: string) => url,
         secureUrlToken: secureUrlToken,
         defaultImgixParams,
@@ -194,7 +202,7 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
     }),
   )
 
-  createTypes([ImgixFixedType, ImgixFluidType])
+  createTypes(imgixTypes)
   createTypes(ImgixImageType)
   createTypes(fieldTypes)
 }

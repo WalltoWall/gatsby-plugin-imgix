@@ -1,11 +1,11 @@
-import { GraphQLFieldConfig, GraphQLString } from 'gatsby/graphql'
 import { ComposeFieldConfigAsObject } from 'graphql-compose'
 import * as T from 'fp-ts/lib/Task'
 import * as TE from 'fp-ts/lib/TaskEither'
 import { pipe } from 'fp-ts/lib/pipeable'
 
 import { buildImgixUrl } from './builders'
-import { ImgixSourceDataResolver, ImgixUrlParamsInputType } from './shared'
+import { ImgixSourceDataResolver } from './shared'
+import { DEFAULT_PARAMS_INPUT_TYPE_NAME } from './createImgixUrlParamsInputType'
 import { ImgixUrlParams } from './types'
 import {
   taskEitherFromSourceDataResolver,
@@ -17,28 +17,30 @@ export interface ImgixUrlArgs {
 }
 
 interface CreateImgixUrlFieldConfigArgs<TSource> {
+  paramsInputType?: string
   resolveUrl: ImgixSourceDataResolver<TSource, string>
   secureUrlToken?: string
   defaultImgixParams?: ImgixUrlParams
 }
 
 export const createImgixUrlFieldConfig = <TSource, TContext>({
+  paramsInputType = DEFAULT_PARAMS_INPUT_TYPE_NAME,
   resolveUrl,
   secureUrlToken,
   defaultImgixParams = {},
-}: CreateImgixUrlFieldConfigArgs<TSource>): GraphQLFieldConfig<
+}: CreateImgixUrlFieldConfigArgs<TSource>): ComposeFieldConfigAsObject<
   TSource,
   TContext,
   ImgixUrlArgs
 > => ({
-  type: GraphQLString,
+  type: 'String',
   args: {
     imgixParams: {
-      type: ImgixUrlParamsInputType,
+      type: paramsInputType,
       defaultValue: {},
     },
   },
-  resolve: (obj: TSource, args: ImgixUrlArgs): Promise<string | undefined> =>
+  resolve: (obj, args): Promise<string | undefined> =>
     pipe(
       obj,
       taskEitherFromSourceDataResolver(resolveUrl),
@@ -54,12 +56,3 @@ export const createImgixUrlFieldConfig = <TSource, TContext>({
       TE.fold(() => T.of(undefined), T.of),
     )(),
 })
-
-export const createImgixUrlSchemaFieldConfig = <TSource, TContext>(
-  args: CreateImgixUrlFieldConfigArgs<TSource>,
-): ComposeFieldConfigAsObject<TSource, TContext, ImgixUrlArgs> =>
-  createImgixUrlFieldConfig(args) as ComposeFieldConfigAsObject<
-    TSource,
-    TContext,
-    ImgixUrlArgs
-  >

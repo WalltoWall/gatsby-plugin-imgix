@@ -1,6 +1,6 @@
 {
   "name": "gatsby-plugin-imgix",
-  "version": "0.8.2",
+  "version": "0.9.0-schema.1",
   "description": "Gatsby plugin which enables the use of Imgix to apply image transformations at request-time",
   "license": "BSD-2-Clause",
   "main": "dist/gatsby-plugin-imgix.js",
@@ -39,40 +39,38 @@
     "images"
   ],
   "dependencies": {
-    "camel-case": "^4.1.1",
-    "fp-ts": "^2.6.2",
-    "imgix-url-params": "^11.4.3",
-    "md5": "^2.2.1",
-    "node-fetch": "^2.6.0",
-    "param-case": "^3.0.3"
+    "camel-case": "^4.1.2",
+    "fp-ts": "^2.9.3",
+    "imgix-url-params": "^11.11.2",
+    "md5": "^2.3.0",
+    "node-fetch": "^2.6.1",
+    "param-case": "^3.0.4"
   },
   "peerDependencies": {
     "gatsby": ">= 2.20.0"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.10.1",
-    "@babel/plugin-proposal-optional-chaining": "^7.10.1",
-    "@commitlint/cli": "^8.3.5",
-    "@commitlint/config-conventional": "^8.3.4",
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
     "@types/isomorphic-fetch": "^0.0.35",
-    "@types/jest": "^25.2.3",
-    "@types/md5": "^2.2.0",
+    "@types/jest": "^26.0.20",
+    "@types/md5": "^2.2.1",
     "@types/node-fetch": "^2.5.7",
-    "@typescript-eslint/eslint-plugin": "^3.0.2",
-    "@typescript-eslint/parser": "^3.0.2",
-    "concurrently": "^5.2.0",
-    "eslint": "^7.1.0",
-    "gatsby": "^2.22.14",
-    "gatsby-image": "^2.4.5",
-    "husky": "^4.2.5",
-    "jest": "^26.0.1",
-    "microbundle": "^0.12.0",
-    "prettier": "^2.0.5",
+    "@typescript-eslint/eslint-plugin": "^4.13.0",
+    "@typescript-eslint/parser": "^4.13.0",
+    "concurrently": "^5.3.0",
+    "eslint": "^7.17.0",
+    "gatsby": "^2.30.1",
+    "gatsby-image": "^2.9.0",
+    "husky": "^4.3.7",
+    "jest": "^26.6.3",
+    "microbundle": "^0.13.0",
+    "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
-    "standard-version": "^8.0.0",
-    "ts-jest": "^26.1.0",
-    "tslib": "^2.0.0",
-    "typescript": "^3.9.3"
+    "standard-version": "^9.1.0",
+    "ts-jest": "^26.4.4",
+    "tslib": "^2.1.0",
+    "typescript": "^4.1.3"
   },
   "prettier": {
     "semi": false,
@@ -80,12 +78,6 @@
     "trailingComma": "all",
     "proseWrap": "always",
     "printWidth": 80
-  },
-  "babel": {
-    "plugins": [
-      "@babel/plugin-proposal-optional-chaining",
-      "@babel/plugin-proposal-nullish-coalescing-operator"
-    ]
   },
   "husky": {
     "hooks": {

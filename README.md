@@ -205,6 +205,34 @@ The following plugins use `gatsby-plugin-imgix`:
 The following functions can be used to integrate `gatsby-plugin-imgix` with your
 plugin.
 
+All field config creators generate configs that can be provided to
+[Gatsby's type builders](https://www.gatsbyjs.com/docs/reference/graphql-data-layer/schema-customization/#gatsby-type-builders).
+
+### createImgixTypes
+
+Creates all types needed by the field config generators, including the shared
+Fixed and Fluid object types and interfaces.
+
+All types returned by this function must be created to use the field creators.
+Alternatively, each type can be created individually using the exported
+functions.
+
+```typescript
+import { GatsbyNode } from 'gatsby'
+import { createImgixTypes } from 'gatsby-plugin-imgix'
+
+export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] = async (
+  gatsbyContext: CreateSchemaCustomizationArgs,
+) => {
+  const { actions, cache, schema } = gatsbyContext
+  const { createTypes } = actions
+
+  const imgixTypes = createImgixTypes({ cache, schema })
+
+  createTypes(imgixTypes)
+}
+```
+
 ### createImgixUrlFieldConfig
 
 Creates a GraphQL field config object that resolves an Imgix URL string to one
@@ -212,25 +240,24 @@ with URL parameters.
 
 ```typescript
 import { GatsbyNode } from 'gatsby'
-import { GraphQLObjectType } from 'gatsby/graphql'
 import { createImgixUrlFieldConfig } from 'gatsby-plugin-imgix'
 
 export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] = async (
   gatsbyContext: CreateSchemaCustomizationArgs,
 ) => {
-  const { actions, cache } = gatsbyContext
+  const { actions, schema } = gatsbyContext
   const { createTypes } = actions
 
-  const GraphQLProductType = new GraphQLObjectType({
+  const ProductType = schema.buildObjectType({
     name: 'Product',
     fields: {
       imageUrl: createImgixUrlFieldConfig({
-        resolveUrl: (url) => url,
+        resolveUrl: (node) => node.image,
       }),
     },
   })
 
-  createTypes(GraphQLProductType)
+  createTypes(ProductType)
 }
 ```
 
@@ -241,26 +268,25 @@ Creates a GraphQL field config object that resolves an Imgix URL string to a
 
 ```typescript
 import { GatsbyNode } from 'gatsby'
-import { GraphQLObjectType } from 'gatsby/graphql'
 import { createImgixFixedFieldConfig } from 'gatsby-plugin-imgix'
 
 export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] = async (
   gatsbyContext: CreateSchemaCustomizationArgs,
 ) => {
-  const { actions, cache } = gatsbyContext
+  const { actions, cache, schema } = gatsbyContext
   const { createTypes } = actions
 
-  const GraphQLProductType = new GraphQLObjectType({
+  const ProductType = schema.buildObjectType({
     name: 'Product',
     fields: {
       imageFixed: createImgixFixedFieldConfig({
-        resolveUrl: (url) => url,
+        resolveUrl: (node) => node.image,
         cache,
       }),
     },
   })
 
-  createTypes(GraphQLProductType)
+  createTypes(ProductType)
 }
 ```
 
@@ -271,26 +297,25 @@ Creates a GraphQL field config object that resolves an Imgix URL string to a
 
 ```typescript
 import { GatsbyNode } from 'gatsby'
-import { GraphQLObjectType } from 'gatsby/graphql'
 import { createImgixFluidFieldConfig } from 'gatsby-plugin-imgix'
 
 export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] = async (
   gatsbyContext: CreateSchemaCustomizationArgs,
 ) => {
-  const { actions, cache } = gatsbyContext
+  const { actions, cache, schema } = gatsbyContext
   const { createTypes } = actions
 
-  const GraphQLProductType = new GraphQLObjectType({
+  const ProductType = schema.buildObjectType({
     name: 'Product',
     fields: {
       imageFluid: createImgixFluidFieldConfig({
-        resolveUrl: (url) => url,
+        resolveUrl: (node) => node.image,
         cache,
       }),
     },
   })
 
-  createTypes(GraphQLProductType)
+  createTypes(ProductType)
 }
 ```
 

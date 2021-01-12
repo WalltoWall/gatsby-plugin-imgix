@@ -1,11 +1,4 @@
-import { GatsbyCache } from 'gatsby'
-import {
-  GraphQLFieldConfig,
-  GraphQLInt,
-  GraphQLNonNull,
-  GraphQLObjectType,
-  GraphQLString,
-} from 'gatsby/graphql'
+import * as gatsby from 'gatsby'
 import { FixedObject } from 'gatsby-image'
 import { ComposeFieldConfigAsObject } from 'graphql-compose'
 import * as T from 'fp-ts/lib/Task'
@@ -13,51 +6,27 @@ import * as TE from 'fp-ts/lib/TaskEither'
 import { pipe } from 'fp-ts/lib/pipeable'
 
 import { ImgixFixedArgs, ImgixUrlParams } from './types'
-import { createImgixBase64UrlFieldConfig } from './createImgixBase64FieldConfig'
+import { DEFAULT_FIXED_TYPE_NAME } from './createImgixFixedType'
+import { DEFAULT_PARAMS_INPUT_TYPE_NAME } from './createImgixUrlParamsInputType'
 import { buildImgixFixed, DEFAULT_FIXED_WIDTH } from './builders'
-import {
-  ImgixSourceDataResolver,
-  ImgixUrlParamsInputType,
-  resolveDimensions,
-} from './shared'
+import { ImgixSourceDataResolver, resolveDimensions } from './shared'
 import { taskEitherFromSourceDataResolver, noop } from './utils'
 
-interface CreateImgixFixedTypeArgs {
-  name: string
-  cache: GatsbyCache
-}
-
-export const createImgixFixedType = ({
-  name,
-  cache,
-}: CreateImgixFixedTypeArgs): GraphQLObjectType<FixedObject> =>
-  new GraphQLObjectType({
-    name,
-    fields: {
-      base64: createImgixBase64UrlFieldConfig({ cache }),
-      src: { type: new GraphQLNonNull(GraphQLString) },
-      srcSet: { type: new GraphQLNonNull(GraphQLString) },
-      srcWebp: { type: new GraphQLNonNull(GraphQLString) },
-      srcSetWebp: { type: new GraphQLNonNull(GraphQLString) },
-      sizes: { type: new GraphQLNonNull(GraphQLString) },
-      width: { type: new GraphQLNonNull(GraphQLInt) },
-      height: { type: new GraphQLNonNull(GraphQLInt) },
-    },
-  })
-
-interface CreateImgixFixedFieldConfigArgs<TSource> {
-  type: GraphQLObjectType<FixedObject>
+export interface CreateImgixFixedFieldConfigArgs<TSource> {
+  type?: string
+  paramsInputType?: string
   resolveUrl: ImgixSourceDataResolver<TSource, string>
   resolveWidth?: ImgixSourceDataResolver<TSource, number>
   resolveHeight?: ImgixSourceDataResolver<TSource, number>
   secureUrlToken?: string
-  cache: GatsbyCache
+  cache: gatsby.GatsbyCache
   defaultImgixParams?: ImgixUrlParams
   defaultPlaceholderImgixParams?: ImgixUrlParams
 }
 
 export const createImgixFixedFieldConfig = <TSource, TContext>({
-  type,
+  type = DEFAULT_FIXED_TYPE_NAME,
+  paramsInputType = DEFAULT_PARAMS_INPUT_TYPE_NAME,
   resolveUrl,
   resolveWidth = noop,
   resolveHeight = noop,
@@ -65,7 +34,7 @@ export const createImgixFixedFieldConfig = <TSource, TContext>({
   cache,
   defaultImgixParams,
   defaultPlaceholderImgixParams,
-}: CreateImgixFixedFieldConfigArgs<TSource>): GraphQLFieldConfig<
+}: CreateImgixFixedFieldConfigArgs<TSource>): ComposeFieldConfigAsObject<
   TSource,
   TContext,
   ImgixFixedArgs
@@ -73,25 +42,22 @@ export const createImgixFixedFieldConfig = <TSource, TContext>({
   type,
   args: {
     width: {
-      type: GraphQLInt,
+      type: 'Int',
       defaultValue: DEFAULT_FIXED_WIDTH,
     },
     height: {
-      type: GraphQLInt,
+      type: 'Int',
     },
     imgixParams: {
-      type: ImgixUrlParamsInputType,
+      type: paramsInputType,
       defaultValue: {},
     },
     placeholderImgixParams: {
-      type: ImgixUrlParamsInputType,
+      type: paramsInputType,
       defaultValue: {},
     },
   },
-  resolve: (
-    obj: TSource,
-    args: ImgixFixedArgs,
-  ): Promise<FixedObject | undefined> =>
+  resolve: (obj, args): Promise<FixedObject | undefined> =>
     pipe(
       obj,
       taskEitherFromSourceDataResolver(
@@ -132,12 +98,3 @@ export const createImgixFixedFieldConfig = <TSource, TContext>({
       TE.getOrElseW(() => T.of(undefined)),
     )(),
 })
-
-export const createImgixFixedSchemaFieldConfig = <TSource, TContext>(
-  args: CreateImgixFixedFieldConfigArgs<TSource>,
-): ComposeFieldConfigAsObject<TSource, TContext, ImgixFixedArgs> =>
-  createImgixFixedFieldConfig(args) as ComposeFieldConfigAsObject<
-    TSource,
-    TContext,
-    ImgixFixedArgs
-  >

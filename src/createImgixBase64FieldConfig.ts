@@ -1,9 +1,5 @@
-import { GatsbyCache } from 'gatsby'
-import {
-  GraphQLNonNull,
-  GraphQLString,
-  GraphQLFieldConfig,
-} from 'gatsby/graphql'
+import * as gatsby from 'gatsby'
+import { ComposeFieldConfigAsObject } from 'graphql-compose'
 import { FixedObject, FluidObject } from 'gatsby-image'
 import * as T from 'fp-ts/lib/Task'
 import * as TE from 'fp-ts/lib/TaskEither'
@@ -12,21 +8,34 @@ import { pipe } from 'fp-ts/lib/pipeable'
 import { fetchImgixBase64Url, ImgixSourceDataResolver } from './shared'
 import { taskEitherFromSourceDataResolver } from './utils'
 
-interface CreateImgixBase64UrlFieldConfigArgs {
+export interface CreateImgixBase64UrlFieldConfigArgs {
+  /** Function mapping the source object to the URL to resolve to a Base64 URL. */
   resolveUrl?: ImgixSourceDataResolver<FixedObject | FluidObject, string>
-  cache: GatsbyCache
+  /** Gatsby cache from a Gatsby Node API. */
+  cache: gatsby.GatsbyCache
 }
 
+/**
+ * Creates a configuration object for a GraphQL type's field that resolves to a Base64 URL from a given image URL.
+ *
+ * Because the image will be converted to a Base64 URL, which effectively inlines the image's data, ensure that the image's filesize is small (< 15 KB recommended).
+ *
+ * **Note**: A network request will be made to gather the image's data.
+ *
+ * @param args Arguments used to build the type.
+ *
+ * @returns Configuration object for a GraphQL type's field.
+ */
 export const createImgixBase64UrlFieldConfig = <TContext>({
   resolveUrl = (obj: FixedObject | FluidObject): string | null | undefined =>
     obj.base64,
   cache,
-}: CreateImgixBase64UrlFieldConfigArgs): GraphQLFieldConfig<
+}: CreateImgixBase64UrlFieldConfigArgs): ComposeFieldConfigAsObject<
   FixedObject | FluidObject,
   TContext
 > => ({
-  type: new GraphQLNonNull(GraphQLString),
-  resolve: (obj: FixedObject | FluidObject): Promise<string | undefined> =>
+  type: 'String!',
+  resolve: (obj): Promise<string | undefined> =>
     pipe(
       obj,
       taskEitherFromSourceDataResolver(resolveUrl),
