@@ -24,7 +24,9 @@ export function invariant(
   msg: string,
   reporter: Reporter,
 ): asserts condition {
-  if (!condition) reporter.panic(`Invariant failed: ${msg}`)
+  if (!condition) {
+    reporter.panic(`Invariant failed: ${msg}`)
+  }
 }
 
 export const noop = (): void => {
@@ -37,6 +39,7 @@ export const transformUrlForWebProxy = (
 ): string => {
   const instance = new URL(`https://${domain}`)
   instance.pathname = encodeURIComponent(url)
+
   return instance.toString()
 }
 
@@ -101,6 +104,7 @@ export const setURLSearchParam = (key: string, value: string | number) => (
 ): string => {
   const u = new URL(url)
   u.searchParams.set(key, String(value))
+
   return u.toString()
 }
 
@@ -109,12 +113,14 @@ export const appendURLSearchParam = (key: string, value: string | number) => (
 ): string => {
   const u = new URL(url)
   u.searchParams.append(key, String(value))
+
   return u.toString()
 }
 
 export const deleteURLSearchParam = (key: string) => (url: string): string => {
   const u = new URL(url)
   u.searchParams.delete(key)
+
   return u.toString()
 }
 
@@ -128,6 +134,7 @@ const semigroupURLSearchParams: Semigroup<URLSearchParams> = {
         ? product.delete(key)
         : product.set(key, value)
     })
+
     return product
   },
 }
@@ -153,7 +160,9 @@ export const setURLSearchParams = <K extends string>(url: string) => (
     new URLSearchParams(defParams),
   )
   mergedParams.forEach((_, key) => {
-    if (undefParams.includes(key as K)) mergedParams.delete(key)
+    if (undefParams.includes(key as K)) {
+      mergedParams.delete(key)
+    }
   })
   u.search = mergedParams.toString()
 
@@ -198,10 +207,13 @@ export const taskEitherFromSourceDataResolver = <TSource, TData>(
   TE.tryCatch(
     () =>
       Promise.resolve(resolver(source)).then((data) => {
-        if (data === undefined || data === null)
+        if (data === undefined || data === null) {
           return Promise.reject('Resolved data is null or undefined')
+        }
 
-        if (!predicate) return data
+        if (!predicate) {
+          return data
+        }
 
         return predicate(data)
           ? data
