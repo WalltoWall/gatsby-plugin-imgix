@@ -2,6 +2,59 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.9.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.8.2...v0.9.0) (2021-01-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* Types created using `graphql-js` are no longer
+supported due to complexities in duplicate/overlapping type with the
+same names.
+
+Use Gatsby's `schema` helpers to create types using the Imgix field
+config creators.
+
+Alternatively, use the new `createImgixTypes` function to build all
+necessary types with default values.
+
+* chore: ignore shell.nix
+
+* chore: upgrade all dependencies
+
+* chore: resolve type error
+
+* chore: remove unused babel plugins
+
+* chore: removed unnecessary gatsby/graphql type
+
+* feat: convert type builders to Gatsby's schema helpers
+
+* feat: update plugin usage with new schema-based builders
+
+* chore(release): 0.9.0-schema.0
+
+* docs: add basic documentation
+
+* chore: rename .eslintrc to .eslintrc.json
+
+* feat: add fluid and fixed interfaces
+
+* feat: add node entry
+
+* style: run eslint --fix
+
+* chore(release): 0.9.0-schema.1
+
+* docs: update examples
+
+* style: format with eslint
+
+* chore: upgrade all dependencies
+
+### Features
+
+* only support Gatsby's schema builders and fix fragments ([#10](https://github.com/WalltoWall/gatsby-plugin-imgix/issues/10)) ([0c734ca](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/0c734ca050325f3d7cf095f5fcd0caba5ca07e2c))
+
 ## [0.9.0-schema.1](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.9.0-schema.0...v0.9.0-schema.1) (2021-01-09)
 
 
