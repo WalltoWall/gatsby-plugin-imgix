@@ -29,7 +29,7 @@ export const createImgixUrlParamsInputType = (
   args.schema.buildInputObjectType({
     name: args.name ?? DEFAULT_PARAMS_INPUT_TYPE_NAME,
     fields: Object.keys(imgixUrlParameters.parameters).reduce(
-      (fields, param) => {
+      (fields: gqlc.InputTypeComposerFieldConfigMapDefinition, param) => {
         const spec =
           imgixUrlParameters.parameters[
             param as keyof typeof imgixUrlParameters.parameters
@@ -69,7 +69,9 @@ export const createImgixUrlParamsInputType = (
             (spec.short_description.slice(-1) === '.' ? '' : '.'),
         }
 
-        const field = fields[name] as gqlc.ComposeInputFieldConfigAsObject
+        const field = fields[
+          name
+        ] as gqlc.InputTypeComposerFieldConfigAsObjectDefinition
 
         // Add the default value as part of the description. Setting it as a
         // GraphQL default value will automatically assign it in the final URL.
@@ -96,6 +98,6 @@ export const createImgixUrlParamsInputType = (
 
         return fields
       },
-      {} as gqlc.ComposeInputFieldConfigMap,
+      {},
     ),
   })

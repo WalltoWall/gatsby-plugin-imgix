@@ -1,5 +1,5 @@
 import * as gatsby from 'gatsby'
-import { ComposeFieldConfigAsObject } from 'graphql-compose'
+import * as gqlc from 'graphql-compose'
 import { FixedObject, FluidObject } from 'gatsby-image'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
@@ -30,7 +30,7 @@ export const createImgixBase64UrlFieldConfig = <TContext>({
   resolveUrl = (obj: FixedObject | FluidObject): string | null | undefined =>
     obj.base64,
   cache,
-}: CreateImgixBase64UrlFieldConfigArgs): ComposeFieldConfigAsObject<
+}: CreateImgixBase64UrlFieldConfigArgs): gqlc.ObjectTypeComposerFieldConfigAsObjectDefinition<
   FixedObject | FluidObject,
   TContext
 > => ({

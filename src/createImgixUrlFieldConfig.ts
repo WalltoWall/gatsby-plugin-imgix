@@ -1,4 +1,4 @@
-import { ComposeFieldConfigAsObject } from 'graphql-compose'
+import * as gqlc from 'graphql-compose'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
 import { pipe } from 'fp-ts/function'
@@ -28,7 +28,7 @@ export const createImgixUrlFieldConfig = <TSource, TContext>({
   resolveUrl,
   secureUrlToken,
   defaultImgixParams = {},
-}: CreateImgixUrlFieldConfigArgs<TSource>): ComposeFieldConfigAsObject<
+}: CreateImgixUrlFieldConfigArgs<TSource>): gqlc.ObjectTypeComposerFieldConfigAsObjectDefinition<
   TSource,
   TContext,
   ImgixUrlArgs
