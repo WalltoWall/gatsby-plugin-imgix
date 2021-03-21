@@ -1,8 +1,13 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See
-[standard-version](https://github.com/conventional-changelog/standard-version)
-for commit guidelines.
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [0.9.1-next.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.9.0...v0.9.1-next.0) (2021-03-21)
+
+
+### Bug Fixes
+
+* use module-aware fp-ts imports ([156019c](https://github.com/WalltoWall/gatsby-plugin-imgix/commit/156019c3f275da399bbdde971bf594fd5afa3fa9))
 
 ## [0.9.0](https://github.com/WalltoWall/gatsby-plugin-imgix/compare/v0.8.2...v0.9.0) (2021-01-12)
 
