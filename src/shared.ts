@@ -1,8 +1,7 @@
 import { GatsbyCache } from 'gatsby'
-import * as TE from 'fp-ts/lib/TaskEither'
-import { TaskEither } from 'fp-ts/lib/TaskEither'
-import { pipe } from 'fp-ts/lib/pipeable'
-import { sequenceT } from 'fp-ts/lib/Apply'
+import * as Ap from 'fp-ts/Apply'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe } from 'fp-ts/function'
 
 import { ImgixMetadata } from './types'
 import { buildImgixUrl } from './builders'
@@ -49,7 +48,7 @@ export const fetchImgixBase64Url = (cache: GatsbyCache) => (
     ),
   )
 
-const sequenceTTE = sequenceT(TE.taskEither)
+const sequenceTTE = Ap.sequenceT(TE.taskEither)
 
 export const resolveDimensions = <TSource>(
   source: TSource,
@@ -57,7 +56,7 @@ export const resolveDimensions = <TSource>(
   resolveHeight: ImgixSourceDataResolver<TSource, number>,
   cache: GatsbyCache,
   secureUrlToken?: string,
-) => (url: string): TaskEither<Error, [number, number]> =>
+) => (url: string): TE.TaskEither<Error, [number, number]> =>
   pipe(
     sequenceTTE(
       taskEitherFromSourceDataResolver(resolveWidth)(source),

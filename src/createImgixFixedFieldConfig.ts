@@ -1,9 +1,9 @@
 import * as gatsby from 'gatsby'
 import { FixedObject } from 'gatsby-image'
 import { ComposeFieldConfigAsObject } from 'graphql-compose'
-import * as T from 'fp-ts/lib/Task'
-import * as TE from 'fp-ts/lib/TaskEither'
-import { pipe } from 'fp-ts/lib/pipeable'
+import * as T from 'fp-ts/Task'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe } from 'fp-ts/pipeable'
 
 import { ImgixFixedArgs, ImgixUrlParams } from './types'
 import { DEFAULT_FIXED_TYPE_NAME } from './createImgixFixedType'

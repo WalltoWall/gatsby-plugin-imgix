@@ -1,16 +1,13 @@
 import _fetch, { Response } from 'node-fetch'
 import { GatsbyCache, Reporter } from 'gatsby'
 import md5 from 'md5'
-import * as A from 'fp-ts/lib/Array'
-import * as O from 'fp-ts/lib/Option'
-import * as R from 'fp-ts/lib/Record'
-import * as TE from 'fp-ts/lib/TaskEither'
-import { Option } from 'fp-ts/lib/Option'
-import { Semigroup, getObjectSemigroup } from 'fp-ts/lib/Semigroup'
-import { Task } from 'fp-ts/lib/Task'
-import { TaskEither } from 'fp-ts/lib/TaskEither'
-import { flow } from 'fp-ts/lib/function'
-import { pipe } from 'fp-ts/lib/pipeable'
+import * as A from 'fp-ts/Array'
+import * as O from 'fp-ts/Option'
+import * as R from 'fp-ts/Record'
+import * as S from 'fp-ts/Semigroup'
+import * as T from 'fp-ts/Task'
+import * as TE from 'fp-ts/TaskEither'
+import { flow, pipe } from 'fp-ts/function'
 
 import { ImgixUrlParams } from './types'
 import { ImgixSourceDataResolver } from './shared'
@@ -49,13 +46,13 @@ export const ns = (namespace = '', str: string): string => `${namespace}${str}`
 export const getFromCache = <A>(
   key: string,
   cache: GatsbyCache,
-): Task<Option<A>> => (): Promise<Option<A>> =>
+): T.Task<O.Option<A>> => (): Promise<O.Option<A>> =>
   cache.get(key).then((value?: A) => O.fromNullable(value))
 
 // setToCache :: Cache -> String -> Task Option String
 export const setToCache = <A>(key: string, cache: GatsbyCache) => (
   value: A,
-): Task<A> => (): Promise<A> => cache.set(key, value).then(() => value)
+): T.Task<A> => (): Promise<A> => cache.set(key, value).then(() => value)
 
 // getFromCacheOr :: Cache, () => TaskEither A B -> String -> TaskEither A B
 export const getFromCacheOr = <A, B>(
@@ -78,14 +75,14 @@ export const getFromCacheOr = <A, B>(
   )
 
 // fetch :: String -> TaskEither Error Response
-export const fetch = (url: string): TaskEither<Error, Response> =>
+export const fetch = (url: string): TE.TaskEither<Error, Response> =>
   TE.tryCatch(
     () => _fetch(url),
     (reason) => new Error(String(reason)),
   )
 
 // fetchJSON :: String -> TaskEither Error String
-export const fetchJSON = <A>(url: string): TaskEither<Error, A> =>
+export const fetchJSON = <A>(url: string): TE.TaskEither<Error, A> =>
   pipe(
     url,
     fetch,
@@ -124,9 +121,9 @@ export const deleteURLSearchParam = (key: string) => (url: string): string => {
   return u.toString()
 }
 
-export const semigroupImgixUrlParams = getObjectSemigroup<ImgixUrlParams>()
+export const semigroupImgixUrlParams = S.getObjectSemigroup<ImgixUrlParams>()
 
-const semigroupURLSearchParams: Semigroup<URLSearchParams> = {
+const semigroupURLSearchParams: S.Semigroup<URLSearchParams> = {
   concat: (x, y) => {
     const product = new URLSearchParams(x.toString())
     y.forEach((value, key) => {
@@ -181,7 +178,7 @@ export const createURLSignature = (secureUrlToken: string) => (
 export const buildBase64URL = (contentType: string, base64: string): string =>
   `data:${contentType};base64,${base64}`
 
-export const signURL = (secureUrlToken: Option<string>) => (
+export const signURL = (secureUrlToken: O.Option<string>) => (
   url: string,
 ): string =>
   pipe(
@@ -203,7 +200,7 @@ export const join = <A>(separator?: string) => (arr: A[]): string =>
 export const taskEitherFromSourceDataResolver = <TSource, TData>(
   resolver: ImgixSourceDataResolver<TSource, TData>,
   predicate?: (data: TData | null) => boolean,
-) => (source: TSource): TaskEither<Error, TData> =>
+) => (source: TSource): TE.TaskEither<Error, TData> =>
   TE.tryCatch(
     () =>
       Promise.resolve(resolver(source)).then((data) => {

@@ -1,10 +1,10 @@
 import { FixedObject, FluidObject } from 'gatsby-image'
-import * as A from 'fp-ts/lib/Array'
-import * as O from 'fp-ts/lib/Option'
-import * as R from 'fp-ts/lib/Record'
-import { eqNumber } from 'fp-ts/lib/Eq'
-import { ordNumber } from 'fp-ts/lib/Ord'
-import { pipe } from 'fp-ts/lib/pipeable'
+import * as A from 'fp-ts/Array'
+import * as O from 'fp-ts/Option'
+import * as R from 'fp-ts/Record'
+import { eqNumber } from 'fp-ts/Eq'
+import { ordNumber } from 'fp-ts/Ord'
+import { pipe } from 'fp-ts/pipeable'
 
 import { ImgixUrlParams, ImgixFixedArgs, ImgixFluidArgs } from './types'
 import {

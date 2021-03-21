@@ -1,7 +1,7 @@
 import { ComposeFieldConfigAsObject } from 'graphql-compose'
-import * as T from 'fp-ts/lib/Task'
-import * as TE from 'fp-ts/lib/TaskEither'
-import { pipe } from 'fp-ts/lib/pipeable'
+import * as T from 'fp-ts/Task'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe } from 'fp-ts/function'
 
 import { buildImgixUrl } from './builders'
 import { ImgixSourceDataResolver } from './shared'
