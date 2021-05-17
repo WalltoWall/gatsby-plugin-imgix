@@ -1,3 +1,11 @@
+> **This package will soon be replaced by [`@imgix/gatsby`][imgix-gatsby]**
+>
+> The official Imgix plugin is based on this repository and includes additional
+> features, such as [`gatsby-plugin-image`] support. Please migrate to
+> `@imgix/gatsby`.
+>
+> This repository and npm package will be archived and deprecated.
+
 # gatsby-plugin-imgix
 
 Gatsby plugin which enables the use of [Imgix][imgix] to apply image
@@ -324,3 +332,5 @@ export const createSchemaCustomization: GatsbyNode['createSchemaCustomization'] 
 [gatsby-image]: https://www.gatsbyjs.org/packages/gatsby-image/
 [prismic]: https://prismic.io/
 [gatsby-source-prismic]: https://github.com/angeloashmore/gatsby-source-prismic
+[imgix-gatsby]: https://github.com/imgix/gatsby
+[gatsby-plugin-image]: https://www.gatsbyjs.com/plugins/gatsby-plugin-image/
