@@ -1,6 +1,6 @@
 {
   "name": "gatsby-plugin-imgix",
-  "version": "0.9.0",
+  "version": "0.9.1-next.0",
   "description": "Gatsby plugin which enables the use of Imgix to apply image transformations at request-time",
   "license": "BSD-2-Clause",
   "main": "dist/gatsby-plugin-imgix.js",
@@ -40,7 +40,7 @@
   ],
   "dependencies": {
     "camel-case": "^4.1.2",
-    "fp-ts": "^2.9.3",
+    "fp-ts": "^2.9.5",
     "imgix-url-params": "^11.11.2",
     "md5": "^2.3.0",
     "node-fetch": "^2.6.1",
@@ -50,27 +50,27 @@
     "gatsby": ">= 2.20.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^11.0.0",
-    "@commitlint/config-conventional": "^11.0.0",
+    "@commitlint/cli": "^12.0.1",
+    "@commitlint/config-conventional": "^12.0.1",
     "@types/isomorphic-fetch": "^0.0.35",
-    "@types/jest": "^26.0.20",
-    "@types/md5": "^2.2.1",
-    "@types/node-fetch": "^2.5.7",
-    "@typescript-eslint/eslint-plugin": "^4.13.0",
-    "@typescript-eslint/parser": "^4.13.0",
-    "concurrently": "^5.3.0",
-    "eslint": "^7.17.0",
-    "gatsby": "^2.30.1",
-    "gatsby-image": "^2.9.0",
-    "husky": "^4.3.7",
+    "@types/jest": "^26.0.21",
+    "@types/md5": "^2.3.0",
+    "@types/node-fetch": "^2.5.8",
+    "@typescript-eslint/eslint-plugin": "^4.18.0",
+    "@typescript-eslint/parser": "^4.18.0",
+    "concurrently": "^6.0.0",
+    "eslint": "^7.22.0",
+    "gatsby": "^3.1.1",
+    "gatsby-image": "^3.1.0",
+    "husky": "^5.1.3",
     "jest": "^26.6.3",
     "microbundle": "^0.13.0",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
-    "standard-version": "^9.1.0",
-    "ts-jest": "^26.4.4",
+    "standard-version": "^9.1.1",
+    "ts-jest": "^26.5.4",
     "tslib": "^2.1.0",
-    "typescript": "^4.1.3"
+    "typescript": "^4.2.3"
   },
   "prettier": {
     "semi": false,
@@ -78,11 +78,6 @@
     "trailingComma": "all",
     "proseWrap": "always",
     "printWidth": 80
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
   },
   "commitlint": {
     "extends": [

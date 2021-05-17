@@ -1,9 +1,9 @@
 import * as gatsby from 'gatsby'
+import * as gqlc from 'graphql-compose'
 import { FluidObject } from 'gatsby-image'
-import { ComposeFieldConfigAsObject } from 'graphql-compose'
-import * as T from 'fp-ts/lib/Task'
-import * as TE from 'fp-ts/lib/TaskEither'
-import { pipe } from 'fp-ts/lib/pipeable'
+import * as T from 'fp-ts/Task'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe } from 'fp-ts/function'
 
 import { ImgixFluidArgs, ImgixUrlParams } from './types'
 import { DEFAULT_FLUID_TYPE_NAME } from './createImgixFluidType'
@@ -34,7 +34,7 @@ export const createImgixFluidFieldConfig = <TSource, TContext>({
   cache,
   defaultImgixParams,
   defaultPlaceholderImgixParams,
-}: CreateImgixFluidFieldConfigArgs<TSource>): ComposeFieldConfigAsObject<
+}: CreateImgixFluidFieldConfigArgs<TSource>): gqlc.ObjectTypeComposerFieldConfigAsObjectDefinition<
   TSource,
   TContext,
   ImgixFluidArgs
