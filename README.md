@@ -1,10 +1,10 @@
-> **This package will soon be replaced by [`@imgix/gatsby`][imgix-gatsby]**
+> **This package has been replaced by [`@imgix/gatsby`][imgix-gatsby]**
 >
-> The official Imgix plugin is based on this repository and includes additional
-> features, such as [gatsby-plugin-image] support. Please migrate to
+> The official Imgix plugin is based on this package and includes additional
+> features such as [gatsby-plugin-image] support. Please migrate to
 > `@imgix/gatsby`.
 >
-> This repository and npm package will be archived and deprecated.
+> This repository and npm package is deprecated.
 
 # gatsby-plugin-imgix
 
