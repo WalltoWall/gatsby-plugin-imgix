@@ -1,6 +1,6 @@
 {
   "name": "gatsby-plugin-imgix",
-  "version": "0.9.1-next.0",
+  "version": "0.9.1",
   "description": "Gatsby plugin which enables the use of Imgix to apply image transformations at request-time",
   "license": "BSD-2-Clause",
   "main": "dist/gatsby-plugin-imgix.js",
